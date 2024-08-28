@@ -67,24 +67,74 @@ def read_sheet_contents(sheet_name, archive_path):
     worksheet_soup = BeautifulSoup(sheet_xml_data, features='xml')
     # cell_styles = workbook_soup.find_all('style', attrs={style:family': 'table-cell})
 
-    col_tags = worksheet_soup.find_all('col')
-    print(f'There are {len(col_tags)} columns in this sheet:')
-    print(col_tags)
+    dimensions_tag = worksheet_soup.find('dimension')
+    dimensions = dimensions_tag.get('ref')
 
+    sheetFormatPr_tag = worksheet_soup.find('sheetFormatPr')
+    default_row_height = sheetFormatPr_tag.get('defaultRowHeight')
+
+    col_tags = worksheet_soup.find_all('col')
+    column_widths = [None]
+    for column in range(len(col_tags)):
+        # print(f'Column {column} width = {col_tags[column].get('width')}')
+        column_widths.append(col_tags[column].get('width'))
+
+    # Read all the raw data into a dictionary
+    sheet_dict = {}
+    # Find the individual rows in the sheet, and iterate through them
     row_tags = worksheet_soup.find_all('row')
-    print(f'There are {len(row_tags)} rows in this sheet:')
-    print(row_tags)
+    row_heights = [None]
+    for row in range(len(row_tags)):
+        if row_tags[row].get('ht') is None:
+            # print(f'Row {row_tags[row].get('r')} height = {default_row_height}')
+            row_heights.append(default_row_height)
+        else:
+            # print(f'Row {row_tags[row].get('r')} height = {row_tags[row].get('ht')}')
+            row_heights.append(row_tags[row].get('ht'))
+
+        # Find the individual cells in each row, and iterate through them
+        cell_tags = row_tags[row].find_all('c')
+        for cell in range(len(cell_tags)):
+            cell_dict = {
+                'raw_value': cell_tags[cell].find('v').text,
+                'style_num': cell_tags[cell].get('s')
+            }
+            if not cell_tags[cell].get('t') is None:  # Some cells have an optional 'Type' property, e.g. 's' = string
+                cell_dict.update({'type': cell_tags[cell].get('t')})
+
+            sheet_dict.update({f'{cell_tags[cell].get('r')}': cell_dict})  # Each cell ref is now a dictionary entry
+
+    return dimensions, sheet_dict, column_widths, row_heights
+    
 
 
 if __name__ == '__main__':
+    print('   --- START ---')
+
     file_to_read = r'test_data/test_sheet_01.xlsx'
+
     temp_archive_path = unzip_xlsx_file(file_to_read)
     sheets_in_workbook = get_sheets_info(temp_archive_path)
 
     # Extract name and sheetId values
-    print(f'There are {len(sheets_in_workbook)} sheets in this workbook')
+    if len(sheets_in_workbook) == 1:
+        print(f'There is {len(sheets_in_workbook)} sheet in this workbook')
+    else:
+        print(f'There are {len(sheets_in_workbook)} sheets in this workbook')
+    
+    # Extract the raw data from each sheet
     for sheet in sheets_in_workbook:
         name = sheet.get('name')
         sheet_id = sheet.get('sheetId')
         print(f'Sheet Name: {name}, Sheet ID: {sheet_id}')
-        read_sheet_contents(name, temp_archive_path)
+        sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(name, temp_archive_path)
+
+        # Display the data extracted from the sheet
+        print(f'Sheet dimensions = {sheet_dimensions}')
+        cell_reference = 'A1'
+        print(f'The raw values of cell {cell_reference} are: {sheet_contents[cell_reference]}')
+        # N.B. Excel numbers values starting at 1 (or A), so the zeroth width and height are None to reduce the chance of errors
+        print(f'Column widths of {name} in order are: {sheet_column_widths}')
+        print(f'Row heights of {name} in order are: {sheet_row_heights}')
+
+    print('   --- END ---')
