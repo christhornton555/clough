@@ -20,6 +20,6 @@ def pretty_print_xml(input_file, output_file):
         file.write(pretty_xml_as_string)
 
 # Just put the relative filepath here
-input_file = r'test_data\test_sheet_01 - Copy\[Content_Types].xml'
+input_file = r'test_data\test_sheet_01 - Copy\xl\theme\theme1.xml'
 output_file = input_file[:-4] + '_PRETTIFIED.xml'
 pretty_print_xml(input_file, output_file)
