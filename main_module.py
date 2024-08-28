@@ -1,5 +1,8 @@
-from get_raw_data_from_xlsx_sheets import unzip_xlsx_file, get_sheets_info, read_sheet_contents
+'''
+This script calls all the other modules
+'''
 
+from get_raw_data_from_xlsx_sheets import unzip_xlsx_file, get_sheets_info, read_sheet_contents
 
 if __name__ == '__main__':
     print('   --- START ---')
