@@ -14,6 +14,7 @@ if __name__ == '__main__':
         sheet_id = sheet.get('sheetId')
         sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(name, temp_archive_path)
 
+        print(name)
         print(sheet_dimensions)
         print(sheet_contents)
         print(sheet_column_widths)
