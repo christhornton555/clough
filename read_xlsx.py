@@ -17,15 +17,22 @@ def get_current_time_string():
 
 # Copy any xlsx file to a zip, and then extract
 def unzip_xlsx_file(filename):
+    # Check the output dir exists, and create it if it doesn't
+    current_dir = 'test_data'
+    output_dir = f'{current_dir}/output'
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
     if filename[-5:] == '.xlsx':
         current_time = get_current_time_string()
-        converted_file = f'test_data/{current_time}_output.zip'
-        shutil.copy(filename, converted_file)  # Create the zip file
+        converted_file = f'{current_time}_output.zip'
+        zip_filepath = f'{current_dir}/{converted_file}'
+        shutil.copy(filename, zip_filepath)  # Create the zip file
 
-        archive_path = converted_file[:-4]
-        shutil.unpack_archive(converted_file, archive_path)  # Unzips to dir
+        archive_path = f'{output_dir}/{converted_file[:-4]}'
+        shutil.unpack_archive(zip_filepath, archive_path)  # Unzips to dir
 
-        os.remove(converted_file)  # Get rid of the temp zip file
+        os.remove(zip_filepath)  # Get rid of the temp zip file
 
         print(f'File unzipped to path {archive_path}')
 
@@ -42,20 +49,24 @@ def get_sheets_info(archive_path):
         workbook_xml_data = workbook_file.read()
 
     # Create a BeautifulSoup object
-    soup = BeautifulSoup(workbook_xml_data, 'xml')
+    workbook_soup = BeautifulSoup(workbook_xml_data, features='xml')
+    # cell_styles = workbook_soup.find_all('style', attrs={style:family': 'table-cell})
 
-    # Find all <s:sheet> tags
-    sheet_tags = soup.find_all('s:sheets')
-    print(f'sheet tags: {sheet_tags}')
+    # Find all <sheet> tags (N.B. BS ignores the <s:sheet> formatting in the original xml)
+    sheet_tags = workbook_soup.find_all('sheet')
+    # print(f'sheet tags: {sheet_tags}')
 
-    # Extract name and sheetId values
-    for sheet in sheet_tags:
-        name = sheet.get('name')
-        sheet_id = sheet.get('sheetId')
-        print(f"Sheet Name: {name}, Sheet ID: {sheet_id}")
+    return sheet_tags
 
 
 if __name__ == '__main__':
-    file_to_read = r'test_data\test_sheet_01.xlsx'
+    file_to_read = r'test_data/test_sheet_01.xlsx'
     temp_archive_path = unzip_xlsx_file(file_to_read)
-    get_sheets_info(temp_archive_path)
+    sheets_in_workbook = get_sheets_info(temp_archive_path)
+
+    # Extract name and sheetId values
+    print(f'There are {len(sheets_in_workbook)} sheets in this workbook')
+    for sheet in sheets_in_workbook:
+        name = sheet.get('name')
+        sheet_id = sheet.get('sheetId')
+        print(f'Sheet Name: {name}, Sheet ID: {sheet_id}')
