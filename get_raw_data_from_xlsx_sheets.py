@@ -4,7 +4,7 @@ This script opens a basic .xlsx file, reads its contents, and displays them to s
 import shutil  # Various utilities including for copying files
 import os  # Handles things like deleting files
 from datetime import datetime  # For timestamping files
-from bs4 import BeautifulSoup  # For picking data out of an XML file - also requires lxml
+from bs4 import BeautifulSoup  # For picking data out of an XML file
 
 
 # Return the current time as a string for timestamping filenames
