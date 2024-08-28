@@ -1,12 +1,7 @@
 from get_raw_data_from_xlsx_sheets import unzip_xlsx_file, get_sheets_info, read_sheet_contents
 
-
-if __name__ == '__main__':
-    print('   --- START ---')
-
-    file_to_read = r'test_data/test_sheet_01.xlsx'
-
-    temp_archive_path = unzip_xlsx_file(file_to_read)
+def get_raw_data(filepath):
+    temp_archive_path = unzip_xlsx_file(filepath)
     sheets_in_workbook = get_sheets_info(temp_archive_path)
 
     # Extract name and sheetId values
@@ -29,5 +24,13 @@ if __name__ == '__main__':
         # N.B. Excel numbers values starting at 1 (or A), so the zeroth width and height are None to reduce the chance of errors
         print(f'Column widths of {name} in order are: {sheet_column_widths}')
         print(f'Row heights of {name} in order are: {sheet_row_heights}')
+
+
+
+if __name__ == '__main__':
+    print('   --- START ---')
+
+    file_to_read = r'test_data/test_sheet_01.xlsx'
+    get_raw_data(file_to_read)
 
     print('   --- END ---')
