@@ -50,13 +50,30 @@ def get_sheets_info(archive_path):
 
     # Create a BeautifulSoup object
     workbook_soup = BeautifulSoup(workbook_xml_data, features='xml')
-    # cell_styles = workbook_soup.find_all('style', attrs={style:family': 'table-cell})
 
     # Find all <sheet> tags (N.B. BS ignores the <s:sheet> formatting in the original xml)
     sheet_tags = workbook_soup.find_all('sheet')
-    # print(f'sheet tags: {sheet_tags}')
 
     return sheet_tags
+
+
+# Read contents of individual sheet
+def read_sheet_contents(sheet_name, archive_path):
+    sheet_path = f'{archive_path}/xl/worksheets/{sheet_name}.xml'
+    with open(sheet_path, 'r') as sheet_file:
+        sheet_xml_data = sheet_file.read()
+
+    # Create a BeautifulSoup object
+    worksheet_soup = BeautifulSoup(sheet_xml_data, features='xml')
+    # cell_styles = workbook_soup.find_all('style', attrs={style:family': 'table-cell})
+
+    col_tags = worksheet_soup.find_all('col')
+    print(f'There are {len(col_tags)} columns in this sheet:')
+    print(col_tags)
+
+    row_tags = worksheet_soup.find_all('row')
+    print(f'There are {len(row_tags)} rows in this sheet:')
+    print(row_tags)
 
 
 if __name__ == '__main__':
@@ -70,3 +87,4 @@ if __name__ == '__main__':
         name = sheet.get('name')
         sheet_id = sheet.get('sheetId')
         print(f'Sheet Name: {name}, Sheet ID: {sheet_id}')
+        read_sheet_contents(name, temp_archive_path)
