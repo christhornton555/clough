@@ -23,11 +23,11 @@ if __name__ == '__main__':
         # print(sheet_column_widths)
         # print(sheet_row_heights)
 
-        cell_ref = 'B1'
+        cell_ref = 'B2'
         if 'type' in sheet_contents[cell_ref]:
             if sheet_contents[cell_ref]['type'] == 's':
                 print(get_string(int(sheet_contents[cell_ref]['raw_value']), temp_archive_path))
         else:
-            print(sheet_contents[cell_ref])
+            print(sheet_contents[cell_ref]['raw_value'])
 
     print('   --- END ---')

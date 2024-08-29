@@ -13,7 +13,9 @@ def get_string(ref, archive_path):
 
     string_tags = strings_soup.find_all('si')
 
-    print(string_tags[ref].find('t').text)
+    # print(string_tags[ref].find('t').text)
+
+    return string_tags[ref].find('t').text
 
 
 if __name__ == '__main__':

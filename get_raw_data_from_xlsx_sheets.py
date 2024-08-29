@@ -34,7 +34,7 @@ def unzip_xlsx_file(filename):
 
         os.remove(zip_filepath)  # Get rid of the temp zip file
 
-        print(f'File unzipped to path {archive_path}')
+        # print(f'File unzipped to path {archive_path}')
 
     else:
         print(f'Specified file, {filename}, was not a .xsls file.')
