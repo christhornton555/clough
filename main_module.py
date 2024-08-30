@@ -4,6 +4,7 @@ This script calls all the other modules
 
 from get_raw_data_from_xlsx_sheets import unzip_xlsx_file, get_sheets_info, read_sheet_contents
 from get_strings_using_string_references import get_string
+from convert_sheet_dimensions_to_list import dimensions_to_list
 
 if __name__ == '__main__':
     print('   --- START ---')
@@ -19,9 +20,10 @@ if __name__ == '__main__':
         sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(name, temp_archive_path)
 
         # print(name)
-        # print(sheet_dimensions)
         # print(sheet_column_widths)
         # print(sheet_row_heights)
+
+        print(f'Sheet dimensions: {dimensions_to_list(sheet_dimensions)}')
 
         cell_ref = 'B2'
         if 'type' in sheet_contents[cell_ref]:
