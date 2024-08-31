@@ -19,17 +19,16 @@ if __name__ == '__main__':
         sheet_id = sheet.get('sheetId')
         sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(name, temp_archive_path)
 
-        # print(name)
         # print(sheet_column_widths)
         # print(sheet_row_heights)
 
-        print(f'Sheet dimensions: {dimensions_to_list(sheet_dimensions)}')
+        print(f'{name} dimensions: {dimensions_to_list(sheet_dimensions)}')
 
-        cell_ref = 'B2'
-        if 'type' in sheet_contents[cell_ref]:
-            if sheet_contents[cell_ref]['type'] == 's':
-                print(get_string(int(sheet_contents[cell_ref]['raw_value']), temp_archive_path))
-        else:
-            print(sheet_contents[cell_ref]['raw_value'])
+        for cell in sheet_contents:
+            if 'type' in sheet_contents[cell]:
+                if sheet_contents[cell]['type'] == 's':
+                    print(f'Cell {cell}: {get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)}')
+            else:
+                print(f'Cell {cell}: {sheet_contents[cell]['raw_value']}')
 
     print('   --- END ---')
