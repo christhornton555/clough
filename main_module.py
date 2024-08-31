@@ -27,8 +27,8 @@ if __name__ == '__main__':
         for cell in sheet_contents:
             if 'type' in sheet_contents[cell]:
                 if sheet_contents[cell]['type'] == 's':
-                    print(f'Cell {cell}: {get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)}')
+                    print(f'Cell {cell}: {get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)} (style {sheet_contents[cell]['style_num']})')
             else:
-                print(f'Cell {cell}: {sheet_contents[cell]['raw_value']}')
+                print(f'Cell {cell}: {sheet_contents[cell]['raw_value']} (style {sheet_contents[cell]['style_num']})')
 
     print('   --- END ---')
