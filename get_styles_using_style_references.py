@@ -13,7 +13,9 @@ def get_style(ref, archive_path):
 
     style_tags = styles_soup.find_all('xf')  # Reads all defined cell styles into list
 
-    # print(style_tags[ref].get('numFmtId'))
+    for tag in style_tags:
+        print(tag)
+    # TODO - reference the style tags correctly - headings are style 1, dates are 2, and floats are 3. Style 0 is present as default
 
     return style_tags[ref].get('numFmtId')
 
