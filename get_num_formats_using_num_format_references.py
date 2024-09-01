@@ -12,7 +12,7 @@ def make_num_formats_dict():
 
     standard_num_formats_dict = {}
     for item in standard_num_formats_list:
-        key, value = int(item[0]), item[1]
+        key, value = item[0], item[1]
         standard_num_formats_dict[key] = value
 
     return standard_num_formats_dict
