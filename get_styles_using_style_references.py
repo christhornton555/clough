@@ -11,11 +11,11 @@ def get_style(ref, archive_path):
     # Create a BeautifulSoup object
     styles_soup = BeautifulSoup(styles_xml_data, features='xml')
 
-    style_tags = styles_soup.find_all('xf')  # Reads all defined cell styles into list
+    cell_xfs_tags = styles_soup.find('cellXfs')  # Reads all defined cell styles into list
+    style_tags = cell_xfs_tags.find_all('xf')
 
-    for tag in style_tags:
-        print(tag)
-    # TODO - reference the style tags correctly - headings are style 1, dates are 2, and floats are 3. Style 0 is present as default
+    # for tag in style_tags:
+    #     print(tag)
 
     return style_tags[ref].get('numFmtId')
 
@@ -23,8 +23,8 @@ def get_style(ref, archive_path):
 if __name__ == '__main__':
     print('   --- START ---')
 
-    style_reference = 3
+    style_reference = 2
     temp_archive_path = 'test_data/output/20240829_000803_output'
-    get_style(style_reference, temp_archive_path)
+    print(get_style(style_reference, temp_archive_path))
 
     print('   --- END ---')
