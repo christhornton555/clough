@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup  # For picking data out of an XML file
 
 def get_string(ref, archive_path):
     strings_file_path = f'{archive_path}/xl/sharedStrings.xml'
-    with open(strings_file_path, 'r') as strings_file_file:
-        strings_xml_data = strings_file_file.read()
+    with open(strings_file_path, 'r') as strings_file:
+        strings_xml_data = strings_file.read()
 
     # Create a BeautifulSoup object
     strings_soup = BeautifulSoup(strings_xml_data, features='xml')
