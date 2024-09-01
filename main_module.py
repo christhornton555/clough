@@ -5,6 +5,7 @@ This script calls all the other modules
 from get_raw_data_from_xlsx_sheets import unzip_xlsx_file, get_sheets_info, read_sheet_contents
 from get_strings_using_string_references import get_string
 from convert_sheet_dimensions_to_list import dimensions_to_list
+from get_styles_using_style_references import get_style
 
 if __name__ == '__main__':
     print('   --- START ---')
@@ -27,8 +28,8 @@ if __name__ == '__main__':
         for cell in sheet_contents:
             if 'type' in sheet_contents[cell]:
                 if sheet_contents[cell]['type'] == 's':
-                    print(f'Cell {cell}: {get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)} (style {sheet_contents[cell]['style_num']})')
+                    print(f'Cell {cell}: {get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)} (style {sheet_contents[cell]['style_num']}, i.e. numFmtId {get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)})')
             else:
-                print(f'Cell {cell}: {sheet_contents[cell]['raw_value']} (style {sheet_contents[cell]['style_num']})')
+                print(f'Cell {cell}: {sheet_contents[cell]['raw_value']} (style {sheet_contents[cell]['style_num']}, i.e. numFmtId {get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)})')
 
     print('   --- END ---')
