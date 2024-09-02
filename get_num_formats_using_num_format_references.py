@@ -12,7 +12,7 @@ def make_num_formats_dict():
 
     standard_num_formats_dict = {}
     for item in standard_num_formats_list:
-        key, value = item[0], item[1]
+        key, value = item[0], [item[1], item[2]]
         standard_num_formats_dict[key] = value
 
     return standard_num_formats_dict
@@ -20,7 +20,7 @@ def make_num_formats_dict():
 if __name__ == '__main__':
     print('   --- START ---')
 
-    num_format_reference = 15
+    num_format_reference = '14'
     temp_archive_path = 'test_data/output/20240829_000803_output'
 
     standard_num_formats_dict = make_num_formats_dict()
