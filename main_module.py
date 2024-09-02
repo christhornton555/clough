@@ -29,6 +29,7 @@ if __name__ == '__main__':
 
         print(f'{name} dimensions: {dimensions_to_list(sheet_dimensions)}')
 
+        # TODO - all this mess below needs tidying up once I've got a proof of concept working
         for cell in sheet_contents:
             if 'type' in sheet_contents[cell]:
                 if sheet_contents[cell]['type'] == 's':
