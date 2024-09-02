@@ -2,6 +2,7 @@
 This script calls all the other modules
 '''
 
+from datetime import datetime
 from get_raw_data_from_xlsx_sheets import unzip_xlsx_file, get_sheets_info, read_sheet_contents
 from get_strings_using_string_references import get_string
 from convert_sheet_dimensions_to_list import dimensions_to_list
@@ -31,11 +32,11 @@ if __name__ == '__main__':
         for cell in sheet_contents:
             if 'type' in sheet_contents[cell]:
                 if sheet_contents[cell]['type'] == 's':
-                    print(f'Cell {cell}: {get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)} (style {sheet_contents[cell]['style_num']}, i.e. numFmt {standard_num_formats_dict[get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)]})')
+                    print(f'Cell {cell}: {get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)} (style {sheet_contents[cell]['style_num']}, i.e. numFmt {standard_num_formats_dict[get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)][0]})')
             else:
-                if standard_num_formats_dict[get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)] == 'General':
+                if standard_num_formats_dict[get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)][0] == 'General':
                     print(f'Cell {cell}: {sheet_contents[cell]['raw_value']} (style {sheet_contents[cell]['style_num']})')
                 else:
-                    print(f'Cell {cell}: {sheet_contents[cell]['raw_value']} (style {sheet_contents[cell]['style_num']}, i.e. numFmt {standard_num_formats_dict[get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)]})')
+                    print(f'Cell {cell}: {datetime.fromordinal(int(sheet_contents[cell]['raw_value'])).strftime(standard_num_formats_dict[get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)][1])} (style {sheet_contents[cell]['style_num']}, i.e. numFmt {standard_num_formats_dict[get_style(int(sheet_contents[cell]['style_num']), temp_archive_path)][1]})')
 
     print('   --- END ---')
