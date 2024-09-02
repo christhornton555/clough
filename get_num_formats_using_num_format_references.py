@@ -21,7 +21,6 @@ if __name__ == '__main__':
     print('   --- START ---')
 
     num_format_reference = '14'
-    temp_archive_path = 'test_data/output/20240829_000803_output'
 
     standard_num_formats_dict = make_num_formats_dict()
     
