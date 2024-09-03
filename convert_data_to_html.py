@@ -9,20 +9,22 @@ def convert_data_to_html(table_data):
         'caption': 'Converted from Excel by Clough'
     }
 
-    table_headers = table_data['Sheet1'][0]  # TODO - Set 'Sheet1' programmatically
-    table_headers_string = ''
-    for table_header in table_headers:
-        table_headers_string += f'\t\t<th>{table_header}</th>\n'
+    for sheet in table_data:
 
-    full_table_string = (
-        f'<table style="width:{table_style['width']}">\n'
-        f'\t<caption>{table_style['caption']}</caption>\n'
-        f'\t<tr>\n'
-        f'{table_headers_string}'
-        f'\t</tr>\n'
-        )
+        table_headers = table_data[sheet][0]
+        table_headers_string = ''
+        for table_header in table_headers:
+            table_headers_string += f'\t\t<th>{table_header}</th>\n'
 
-    print(full_table_string)
+        full_table_string = (
+            f'<table style="width:{table_style['width']}">\n'
+            f'\t<caption>{table_style['caption']}</caption>\n'
+            f'\t<tr>\n'
+            f'{table_headers_string}'
+            f'\t</tr>\n'
+            )
+
+        print(full_table_string)
 
 
 if __name__ == '__main__':
