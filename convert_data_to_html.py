@@ -24,8 +24,10 @@ def convert_data_to_html(table_data):
                 table_body_string += f'\t\t\t<td>{table_data[sheet][row][col]}</td>\n'
             table_body_string += f'\t\t</tr>\n'
 
+        table_foot_string = ''  # Not currently implemented - included for completeness
+
         full_table_string = (
-            f'<table style="width:{table_style['width']}">\n'
+            f'<table class="clough" id="{sheet}" style="width:{table_style['width']}">\n'
             f'\t<caption>{table_style['caption']}</caption>\n'
             f'\t<thead>\n'
             f'\t\t<tr>\n'
@@ -35,10 +37,15 @@ def convert_data_to_html(table_data):
 
             f'\t<tbody>\n'
             f'{table_body_string}'
-            f'\t</tbody>\n'
+            f'\t</tbody>\n\n'
+
+            f'\t<tfoot>\n'
+            f'{table_foot_string}'
+            f'\t</tfoot>\n\n'
+            f'</table>\n'
             )
 
-        print(full_table_string)
+        return full_table_string  # TODO - This is currently only returning the string for a single sheet - need to get it doing multi-sheet books
 
 
 if __name__ == '__main__':
@@ -77,6 +84,7 @@ if __name__ == '__main__':
                             [30, '29-Aug-24', '0'], 
                             [31, '30-Aug-24', '11.3']]}
     
-    convert_data_to_html(test_data)
+    table_string = convert_data_to_html(test_data)
+    print(table_string)
 
     print('   --- END ---')
