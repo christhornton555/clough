@@ -10,18 +10,32 @@ def convert_data_to_html(table_data):
     }
 
     for sheet in table_data:
+        sheet_columns = 3  # TODO - set this programatically
 
         table_headers = table_data[sheet][0]
         table_headers_string = ''
         for table_header in table_headers:
-            table_headers_string += f'\t\t<th>{table_header}</th>\n'
+            table_headers_string += f'\t\t\t<th>{table_header}</th>\n'
+
+        
+        for row in range(1, len(table_data[sheet])):  # Skip the first row which just has column labels A, B, C, etc
+            table_body_string = f'\t\t<tr>\n'
+            for col in range(sheet_columns):
+                table_body_string += f'\t\t\t<td>{table_data[sheet][row][col]}</td>\n'
+            table_body_string += f'\t\t</tr>\n'
 
         full_table_string = (
             f'<table style="width:{table_style['width']}">\n'
             f'\t<caption>{table_style['caption']}</caption>\n'
-            f'\t<tr>\n'
+            f'\t<thead>\n'
+            f'\t\t<tr>\n'
             f'{table_headers_string}'
-            f'\t</tr>\n'
+            f'\t\t</tr>\n'
+            f'\t</thead>\n\n'
+
+            f'\t<tbody>\n'
+            f'{table_body_string}'
+            f'\t</tbody>\n'
             )
 
         print(full_table_string)
