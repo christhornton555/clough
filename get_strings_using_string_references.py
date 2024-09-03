@@ -13,7 +13,7 @@ def get_string(ref, archive_path):
 
     string_tags = strings_soup.find_all('si')
 
-    print(string_tags[ref])
+    # print(string_tags[ref])
 
     # print(string_tags[ref].find('t').text)
 
@@ -25,6 +25,7 @@ if __name__ == '__main__':
 
     string_reference = 0
     temp_archive_path = 'test_data/output/20240829_000803_output'
-    get_string(string_reference, temp_archive_path)
+    string_value = get_string(string_reference, temp_archive_path)
+    print(string_value)
 
     print('   --- END ---')
