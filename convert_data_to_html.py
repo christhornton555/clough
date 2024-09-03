@@ -2,8 +2,27 @@
 This script takes a dictionary containing a worksheet's data, and produces an HTML table of it
 '''
 
-def convert_data_to_html(data):
-    print(data)
+def convert_data_to_html(table_data):
+    # print(data)
+    table_style = {
+        'width': '100%',
+        'caption': 'Converted from Excel by Clough'
+    }
+
+    table_headers = table_data['Sheet1'][0]  # TODO - Set 'Sheet1' programmatically
+    table_headers_string = ''
+    for table_header in table_headers:
+        table_headers_string += f'\t\t<th>{table_header}</th>\n'
+
+    full_table_string = (
+        f'<table style="width:{table_style['width']}">\n'
+        f'\t<caption>{table_style['caption']}</caption>\n'
+        f'\t<tr>\n'
+        f'{table_headers_string}'
+        f'\t</tr>\n'
+        )
+
+    print(full_table_string)
 
 
 if __name__ == '__main__':
