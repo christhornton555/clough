@@ -15,16 +15,23 @@ def make_table(input_file):
     temp_archive_path = unzip_xlsx_file(input_file)
 
     sheets_in_workbook = get_sheets_info(temp_archive_path)
+
+    workbook = {}
+
     # Extract the raw data from each sheet
     for sheet in sheets_in_workbook:
         name = sheet.get('name')
         sheet_id = sheet.get('sheetId')
+
+        workbook[name] = []
+
         sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(name, temp_archive_path)
 
         # print(sheet_column_widths)
         # print(sheet_row_heights)
 
         print(f'{name} dimensions: {dimensions_to_list(sheet_dimensions)}')
+        # TODO - create the worksheet columns in workbook{}
 
         # TODO - all this mess below needs tidying up once I've got a proof of concept working
         for cell in sheet_contents:
@@ -55,10 +62,13 @@ def make_table(input_file):
                 else:
                     print(f'Cell {cell}: {sheet_contents[cell]['raw_value']} (style {sheet_contents[cell]['style_num']})')
 
+    return workbook
+
 if __name__ == '__main__':
     print('   --- START ---')
 
     file_to_read = r'test_data/test_sheet_01.xlsx'
-    make_table(file_to_read)
+    workbook_to_output = make_table(file_to_read)
+    print(workbook_to_output)
 
     print('   --- END ---')
