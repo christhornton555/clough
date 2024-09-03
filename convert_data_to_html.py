@@ -9,6 +9,8 @@ def convert_data_to_html(table_data):
         'caption': 'Converted from Excel by Clough'
     }
 
+    all_table_strings = {}
+
     for sheet in table_data:
         sheet_columns = 3  # TODO - set this programatically
 
@@ -45,7 +47,8 @@ def convert_data_to_html(table_data):
             f'</table>\n'
             )
 
-        return full_table_string  # TODO - This is currently only returning the string for a single sheet - need to get it doing multi-sheet books
+        all_table_strings[sheet] = full_table_string
+    return all_table_strings
 
 
 if __name__ == '__main__':
@@ -84,7 +87,7 @@ if __name__ == '__main__':
                             [30, '29-Aug-24', '0'], 
                             [31, '30-Aug-24', '11.3']]}
     
-    table_string = convert_data_to_html(test_data)
-    print(table_string)
+    table_strings = convert_data_to_html(test_data)
+    print(table_strings)
 
     print('   --- END ---')

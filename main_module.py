@@ -11,7 +11,7 @@ if __name__ == '__main__':
     file_to_read = r'test_data/test_sheet_01.xlsx'
     workbook_to_output = make_workbook_dict(file_to_read)
 
-    table_string = convert_data_to_html(workbook_to_output)  # TODO - update after multi-sheet functionality is added
+    table_string = convert_data_to_html(workbook_to_output)['Sheet1']
     print(table_string)
 
     print('   --- END ---')
