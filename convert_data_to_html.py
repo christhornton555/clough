@@ -12,7 +12,7 @@ def convert_data_to_html(table_data):
     all_table_strings = {}
 
     for sheet in table_data:
-        sheet_columns = 3  # TODO - set this programatically
+        sheet_columns = len(max(table_data[sheet], key=len))  # Find the longest row length, in case of rows of differing length
 
         table_headers = table_data[sheet][0]
         table_headers_string = ''
