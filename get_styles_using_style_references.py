@@ -13,8 +13,9 @@ def get_style(ref, archive_path):
 
     cell_xfs_tags = styles_soup.find('cellXfs')  # Reads all defined cell styles into list
     style_tags = cell_xfs_tags.find_all('xf')
+    alignment_tags = cell_xfs_tags.find_all('alignment')
 
-    # for tag in style_tags:
+    # for tag in alignment_tags:
     #     print(tag)
 
     return style_tags[ref].get('numFmtId')
