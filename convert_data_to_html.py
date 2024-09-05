@@ -14,34 +14,44 @@ def convert_data_to_html(table_data):
     for sheet in table_data:
         sheet_columns = len(max(table_data[sheet], key=len))  # Find the longest row length, in case of rows of differing length
 
+        # Define classes to later format as necessary
+        table_classes_string = ''
+        table_caption_classes_string = ''
+        table_head_classes_string = ''
+        table_body_classes_string = ''
+        table_foot_classes_string = ''
+        table_th_classes_string = ''
+        table_tr_classes_string = ''
+        table_td_classes_string = ''
+
         table_headers = table_data[sheet][0]
         table_headers_string = ''
         for table_header in table_headers:
-            table_headers_string += f'\t\t\t<th>{table_header}</th>\n'
+            table_headers_string += f'\t\t\t<th class="{table_th_classes_string}">{table_header}</th>\n'
 
         table_body_string = ''
         for row in range(1, len(table_data[sheet])):  # Skip the first row which just has column labels A, B, C, etc
-            table_body_string += f'\t\t<tr>\n'
+            table_body_string += f'\t\t<tr class="{table_tr_classes_string}">\n'
             for col in range(sheet_columns):
-                table_body_string += f'\t\t\t<td>{table_data[sheet][row][col]}</td>\n'
+                table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col]}</td>\n'
             table_body_string += f'\t\t</tr>\n'
 
         table_foot_string = ''  # Not currently implemented - included for completeness
 
         full_table_string = (
-            f'<table class="clough" id="{sheet}" style="width:{table_style['width']}">\n'
-            f'\t<caption>{table_style['caption']}</caption>\n'
-            f'\t<thead>\n'
-            f'\t\t<tr>\n'
+            f'<table class="clough {table_classes_string}" id="{sheet}" style="width:{table_style['width']}">\n'
+            f'\t<caption class="{table_caption_classes_string}">{table_style['caption']}</caption>\n'
+            f'\t<thead class="{table_head_classes_string}">\n'
+            f'\t\t<tr class="{table_tr_classes_string}">\n'
             f'{table_headers_string}'
             f'\t\t</tr>\n'
             f'\t</thead>\n\n'
 
-            f'\t<tbody>\n'
+            f'\t<tbody class="{table_body_classes_string}">\n'
             f'{table_body_string}'
             f'\t</tbody>\n\n'
 
-            f'\t<tfoot>\n'
+            f'\t<tfoot class="{table_foot_classes_string}">\n'
             f'{table_foot_string}'
             f'\t</tfoot>\n\n'
             f'</table>\n'
