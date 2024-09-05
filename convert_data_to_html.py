@@ -3,13 +3,13 @@ This script takes a dictionary containing a worksheet's data, and produces an HT
 '''
 
 def convert_data_to_html(table_data):
-    # print(data)
     table_style = {
         'width': '100%',
         'caption': 'Converted from Excel by Clough'
     }
 
     all_table_strings = {}
+    css_class_definitions_to_add = []  # Classes will be added to this list as they're detected, then written into <head><style> later
 
     for sheet in table_data:
         sheet_columns = len(max(table_data[sheet], key=len))  # Find the longest row length, in case of rows of differing length
@@ -33,7 +33,18 @@ def convert_data_to_html(table_data):
         for row in range(1, len(table_data[sheet])):  # Skip the first row which just has column labels A, B, C, etc
             table_body_string += f'\t\t<tr class="{table_tr_classes_string}">\n'
             for col in range(sheet_columns):
-                table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col]}</td>\n'
+                cell_metadata = ''
+                if col > 0:  # Ignore first column, which just has row numbers
+                    cell_metadata = table_data[sheet][row][col][1]
+                    if cell_metadata['horizontal_alignment'] != None:
+                        table_td_classes_string = f'clough-align-{cell_metadata['horizontal_alignment']}'
+                    else:
+                        table_td_classes_string = ''
+
+                    table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col][0]}</td>\n'
+                else:
+                    table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col]}</td>\n'
+                table_td_classes_string = ''  # Clear last values
             table_body_string += f'\t\t</tr>\n'
 
         table_foot_string = ''  # Not currently implemented - included for completeness
@@ -58,7 +69,7 @@ def convert_data_to_html(table_data):
             )
 
         all_table_strings[sheet] = full_table_string
-    return all_table_strings
+    return all_table_strings, css_class_definitions_to_add
 
 
 if __name__ == '__main__':
@@ -97,7 +108,7 @@ if __name__ == '__main__':
                             [30, '29-Aug-24', '0'], 
                             [31, '30-Aug-24', '11.3']]}
     
-    table_strings = convert_data_to_html(test_data)
-    print(table_strings)
+    table_strings, css = convert_data_to_html(test_data)
+    # print(css)
 
     print('   --- END ---')

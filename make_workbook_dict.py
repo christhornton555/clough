@@ -80,9 +80,9 @@ def make_workbook_dict(input_file):
             current_cell_style_ref = sheet_contents[cell]['style_num']
             # Convert style ref to actual style
             current_cell_style_dict = get_style(int(current_cell_style_ref), temp_archive_path)
-            print(current_cell_style_dict)
+            # print(current_cell_style_dict)
             current_cell_num_style = standard_num_formats_dict[current_cell_style_dict['numFmtId']][1]
-            print(current_cell_num_style)
+            # print(current_cell_num_style)
 
             # Check if cell has a type specified (e.g. 's' for string)
             if 'type' in sheet_contents[cell]:
@@ -115,7 +115,7 @@ def make_workbook_dict(input_file):
                     current_cell_display_value = converted_date.strftime(current_cell_num_style)
 
             current_cell_display = f'{current_cell_display_value}'
-            workbook[name][int(current_row)].append(current_cell_display)
+            workbook[name][int(current_row)].append([current_cell_display, current_cell_style_dict])
 
     shutil.rmtree(temp_archive_path)  # Tidy up by deleting the temp unzipped archive
 

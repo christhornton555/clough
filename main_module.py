@@ -13,8 +13,9 @@ if __name__ == '__main__':
     html_template_file = r'test_data/cloughtest_template.html'
 
     workbook_to_output = make_workbook_dict(file_to_read)
+    # print(workbook_to_output)
 
-    all_table_strings = convert_data_to_html(workbook_to_output)
+    all_table_strings, all_extra_css = convert_data_to_html(workbook_to_output)
 
     insert_table_into_template(html_template_file, all_table_strings)
 
