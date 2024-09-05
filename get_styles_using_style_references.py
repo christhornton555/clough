@@ -17,14 +17,20 @@ def get_style(ref, archive_path):
 
     # for tag in alignment_tags:
     #     print(tag)
+    # print(alignment_tags[ref].get('horizontal'))
 
-    return style_tags[ref].get('numFmtId')
+    output_dict = {
+        'numFmtId': style_tags[ref].get('numFmtId'),
+        'horizontal_alignment': alignment_tags[ref-1].get('horizontal')  # 1st (default) <xf> tag has no <alignment> sub-tag, hence ref-1
+    }
+
+    return output_dict
 
 
 if __name__ == '__main__':
     print('   --- START ---')
 
-    style_reference = 2
+    style_reference = 3
     temp_archive_path = 'test_data/output/20240829_000803_output'
     print(get_style(style_reference, temp_archive_path))
 

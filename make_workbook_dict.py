@@ -79,7 +79,10 @@ def make_workbook_dict(input_file):
 
             current_cell_style_ref = sheet_contents[cell]['style_num']
             # Convert style ref to actual style
-            current_cell_style = standard_num_formats_dict[get_style(int(current_cell_style_ref), temp_archive_path)][1]
+            current_cell_style_dict = get_style(int(current_cell_style_ref), temp_archive_path)
+            print(current_cell_style_dict)
+            current_cell_num_style = standard_num_formats_dict[current_cell_style_dict['numFmtId']][1]
+            print(current_cell_num_style)
 
             # Check if cell has a type specified (e.g. 's' for string)
             if 'type' in sheet_contents[cell]:
@@ -95,8 +98,8 @@ def make_workbook_dict(input_file):
                 current_cell_display_value = get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)
 
             # If style is not General (i.e. default, no styling), apply that style
-            if current_cell_style != 'General':
-                if standard_num_formats_dict[get_style(int(current_cell_style_ref), temp_archive_path)][0] == 'd-mmm-yy':
+            if current_cell_num_style != 'General':
+                if standard_num_formats_dict[current_cell_style_dict['numFmtId']][0] == 'd-mmm-yy':
                     # Excel processes dates idiosynchratically, so we can't just apply the number format without fixing some stuff
                     # TODO - gonna need to apply this to all the other date formats I reckon, ugh. I might have half cracked it below, but need to check
                     # Excel's date system starts on 1900-01-01
@@ -109,7 +112,7 @@ def make_workbook_dict(input_file):
                     converted_date = base_date + timedelta(days=excel_date)
 
                     # Apply the desired format
-                    current_cell_display_value = converted_date.strftime(current_cell_style)
+                    current_cell_display_value = converted_date.strftime(current_cell_num_style)
 
             current_cell_display = f'{current_cell_display_value}'
             workbook[name][int(current_row)].append(current_cell_display)
