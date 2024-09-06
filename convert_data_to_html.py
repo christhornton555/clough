@@ -43,7 +43,8 @@ def convert_data_to_html(table_data):
                         table_td_classes_string = f'clough-align-none'
                         
                     if 'font_style' in cell_metadata:
-                        table_td_classes_string += f' clough-font-{cell_metadata['font_style']}'
+                        for bold_italic_underline_style in cell_metadata['font_style'].split():
+                            table_td_classes_string += f' clough-font-{bold_italic_underline_style}'
 
                     table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col][0]}</td>\n'
                 else:
