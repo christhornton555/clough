@@ -30,7 +30,7 @@ if __name__ == '__main__':
     print('   --- START ---')
 
     # Just put the relative filepath here
-    input_file = r'test_data/test_sheet_01 - Copy/xl/theme/theme1.xml'
+    input_file = r'test_data/test_sheet_01 - Copy/xl/styles.xml'
     output_file = input_file[:-4] + '_PRETTIFIED.xml'
     pretty_print_xml(input_file, output_file)
     
