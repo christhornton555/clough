@@ -17,7 +17,7 @@ def split_template(template_file_path):
 
 def insert_table_into_template(template_file, table_strings):
     current_time = get_current_time_string()
-    output_file_path = f'test_data/output/{current_time}_cloughtest_output.html'
+    output_file_path = f'test_data/output/cloughtest_output.html'  # {current_time}_  TODO - add this prefix back in
     for sheet in table_strings:  # TODO - make this handle multisheets
         table_to_insert = table_strings[sheet]
         html_template_top, html_template_tail = split_template(template_file)
