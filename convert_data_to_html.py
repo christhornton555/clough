@@ -4,7 +4,7 @@ This script takes a dictionary containing a worksheet's data, and produces an HT
 
 def convert_data_to_html(table_data):
     table_style = {
-        'width': '100%',
+        'width': '80%',
         'caption': 'Converted from Excel by Clough'
     }
 
@@ -26,7 +26,7 @@ def convert_data_to_html(table_data):
 
         table_headers = table_data[sheet][0]
         table_headers_string = ''
-        table_th_classes_string = f'clough-header-align-center'
+        table_th_classes_string = f'clough-column-letters'
         for table_header in table_headers:
             table_headers_string += f'\t\t\t<th class="{table_th_classes_string}">{table_header}</th>\n'
 
@@ -37,14 +37,17 @@ def convert_data_to_html(table_data):
                 cell_metadata = ''
                 if col > 0:  # Ignore first column, which just has row numbers
                     cell_metadata = table_data[sheet][row][col][1]
-                    if cell_metadata['horizontal_alignment'] != None:
+                    if 'horizontal_alignment' in cell_metadata:
                         table_td_classes_string = f'clough-align-{cell_metadata['horizontal_alignment']}'
                     else:
                         table_td_classes_string = f'clough-align-none'
+                        
+                    if 'font_style' in cell_metadata:
+                        table_td_classes_string += f' clough-font-{cell_metadata['font_style']}'
 
                     table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col][0]}</td>\n'
                 else:
-                    table_td_classes_string = f'clough-align-center'  # Row numbers
+                    table_td_classes_string = f'clough-row-numbers'  # 1st col is row numbers
                     table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col]}</td>\n'
                 table_td_classes_string = ''  # Clear last values
             table_body_string += f'\t\t</tr>\n'
