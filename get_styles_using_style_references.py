@@ -3,7 +3,11 @@ This script takes a style reference and find and returns the style it relates to
 '''
 from bs4 import BeautifulSoup  # For picking data out of an XML file 
 
-def get_style(ref, archive_path):
+def get_font(font_ref, styles):
+    font_tags = styles.find_all('font')
+    return font_tags[int(font_ref)]
+
+def get_style(style_ref, archive_path):
     styles_file_path = f'{archive_path}/xl/styles.xml'
     with open(styles_file_path, 'r') as styles_file:
         styles_xml_data = styles_file.read()
@@ -15,14 +19,19 @@ def get_style(ref, archive_path):
     style_tags = cell_xfs_tags.find_all('xf')
     alignment_tags = cell_xfs_tags.find_all('alignment')
 
-    # for tag in alignment_tags:
-    #     print(tag)
-    # print(alignment_tags[ref].get('horizontal'))
+    # Now convert the fontId value in this style into actual details about styling
+    font_id = style_tags[style_ref].get('fontId')
+    font = get_font(font_id, styles_soup)
 
     output_dict = {
-        'numFmtId': style_tags[ref].get('numFmtId'),
-        'horizontal_alignment': alignment_tags[ref-1].get('horizontal')  # 1st (default) <xf> tag has no <alignment> sub-tag, hence ref-1
+        'numFmtId': style_tags[style_ref].get('numFmtId')
     }
+
+    if alignment_tags[style_ref-1].get('horizontal') != None:
+        output_dict['horizontal_alignment'] = alignment_tags[style_ref-1].get('horizontal')  # 1st (default) <xf> tag has no <alignment> sub-tag, hence ref-1
+    
+    if font.find('b') != None:
+        output_dict['font_style'] = 'bold'
 
     return output_dict
 
