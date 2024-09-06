@@ -26,6 +26,7 @@ def convert_data_to_html(table_data):
 
         table_headers = table_data[sheet][0]
         table_headers_string = ''
+        table_th_classes_string = f'clough-header-align-center'
         for table_header in table_headers:
             table_headers_string += f'\t\t\t<th class="{table_th_classes_string}">{table_header}</th>\n'
 
@@ -39,10 +40,11 @@ def convert_data_to_html(table_data):
                     if cell_metadata['horizontal_alignment'] != None:
                         table_td_classes_string = f'clough-align-{cell_metadata['horizontal_alignment']}'
                     else:
-                        table_td_classes_string = ''
+                        table_td_classes_string = f'clough-align-none'
 
                     table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col][0]}</td>\n'
                 else:
+                    table_td_classes_string = f'clough-align-center'  # Row numbers
                     table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col]}</td>\n'
                 table_td_classes_string = ''  # Clear last values
             table_body_string += f'\t\t</tr>\n'
