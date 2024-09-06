@@ -30,8 +30,20 @@ def get_style(style_ref, archive_path):
     if alignment_tags[style_ref-1].get('horizontal') != None:
         output_dict['horizontal_alignment'] = alignment_tags[style_ref-1].get('horizontal')  # 1st (default) <xf> tag has no <alignment> sub-tag, hence ref-1
     
+    # Add font styles (bold, italic, underline) if present
+    output_dict['font_style'] = ''
     if font.find('b') != None:
-        output_dict['font_style'] = 'bold'
+        output_dict['font_style'] += 'bold '
+    
+    if font.find('i') != None:
+        output_dict['font_style'] += 'italic '
+    
+    if font.find('u') != None:
+        output_dict['font_style'] += 'underline '
+
+    # Remove the 'font_style' key if it's empty
+    if not output_dict['font_style']:
+        output_dict.pop('font_style', None)  # Remove key if empty
 
     return output_dict
 

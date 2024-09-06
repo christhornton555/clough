@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<s:sst xmlns:s="http://schemas.openxmlformats.org/spreadsheetml/2006/main" count="2" uniqueCount="2">
-	<s:si>
-		<s:t>Date</s:t>
-	</s:si>
-	<s:si>
-		<s:t>Rainfall (mm)</s:t>
-	</s:si>
-</s:sst>

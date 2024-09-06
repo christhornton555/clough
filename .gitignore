@@ -2,3 +2,7 @@
 test_data/output/
 __pycache__
 __pycache__/get_raw_data_from_xlsx_sheets.cpython-312.pyc
+__pycache__/get_raw_data_from_xlsx_sheets.cpython-312.pyc
+test_data/test_sheet_01 - Copy/xl/printerSettings/printerSettings1.bin
+test_data/test_sheet_01 - Copy/xl/worksheets/_rels/sheet1.xml.rels
+__pycache__/get_raw_data_from_xlsx_sheets.cpython-312.pyc
