@@ -25,22 +25,20 @@ def insert_table_into_template(template_file, table_strings):
     # Need to process first sheet separately to create tables_to_insert for later additions from other sheets
     tables_to_insert = table_strings[first_sheet_in_table]
     html_template_top, html_template_tail = split_template(template_file)
+    workbook_tabs_html = f'''\n\n<div class="tabs">\n
+    <button class="tab-link active" onclick="showSheet(event, '{first_sheet_in_table}')">{first_sheet_in_table}</button>\n'''
 
     # Now use the iterator to add sheets after the first one, if there are any
     if len(table_strings) > 1:
         try:
             for sheet_name in sheet_key_iterator:
                 tables_to_insert += f'\n\n{table_strings[sheet_name]}'
+                workbook_tabs_html += f'''<button class="tab-link" onclick="showSheet(event, '{sheet_name}')">{sheet_name}</button>\n'''
         except StopIteration:
             print('Error: no more sheets left')  # Should be unreachable
     
     tab_offset = '\t\t'  # TODO - Set programmatically
-    tabs_html = '''\n\n<div class="tabs">\n
-    <button class="tab-link active" onclick="showTable(event, 'Sheet1')">Table 1</button>\n
-    <button class="tab-link" onclick="showTable(event, 'Sheet2')">Table 2</button>\n
-    <button class="tab-link" onclick="showTable(event, 'Sheet3')">Table 3</button>\n
-    </div>\n\n'''
-    full_html = html_template_top + f'{tab_offset}<div class="spreadsheet-workbook">\n' + tables_to_insert + f'{tab_offset}</div>\n' + tabs_html + html_template_tail
+    full_html = html_template_top + f'{tab_offset}<div class="spreadsheet-workbook">\n' + tables_to_insert + f'{tab_offset}</div>\n' + workbook_tabs_html + html_template_tail
 
     with open(output_file_path, 'w') as output_file:
         output_file.write(full_html)

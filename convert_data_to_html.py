@@ -21,9 +21,9 @@ def convert_data_to_html(table_data):
 
         # Define classes to later format as necessary
         if sheet != first_sheet_in_table:
-            table_classes_string = 'clough-display_none'
+            table_classes_string = 'clough-tabbable-table'  # TODO - do i need to set a display-none class here?
         else:
-            table_classes_string = ''
+            table_classes_string = 'clough-tabbable-table'
         table_caption_classes_string = ''
         table_head_classes_string = ''
         table_body_classes_string = ''

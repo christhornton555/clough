@@ -24,7 +24,7 @@
             color: #fff;
             text-align: center;
             padding: 10px 0;
-            /* position: fixed; */
+            position: fixed;
             width: 100%;
             bottom: 0;
         }
@@ -43,7 +43,7 @@
             left: 30;
             border: 1px solid #ddd;
         }
-        .clough-display_none {
+        table[style="display:none;"] {
             display: none;
         }
         table, th, td {
@@ -112,7 +112,7 @@
         .clough-tab-link.active {
             background-color: #ccc;
         }
-        .clough-tab-content {
+        .clough-tabbable-table {
             position: relative;
             height: auto;
         }
@@ -146,11 +146,12 @@
 
     <!-- JavaScript goes here -->
     <script>
-        function showTable(event, tableId) {
+        function showSheet(event, tableId) {
             // Hide all tables
-            const tables = document.querySelectorAll('.tab-content table');
+            const tables = document.querySelectorAll('.clough-tabbable-table');
+            // console.log(tables[0].id);
             tables.forEach(table => table.style.display = 'none');
-
+            
             // Remove active class from all buttons
             const tabLinks = document.querySelectorAll('.tab-link');
             tabLinks.forEach(tab => tab.classList.remove('active'));
@@ -161,6 +162,9 @@
             // Set the clicked tab to active
             event.currentTarget.classList.add('active');
         }
+        const all_tables = document.querySelectorAll('.clough-tabbable-table');
+        console.log(all_tables[0].id);
+        window.onload = showSheet(onclick, 'Sheet1');  // TODO - this is hacky, make it better
     </script>
 
 </body>
