@@ -95,9 +95,20 @@ def read_sheet_contents(sheet_name, archive_path):
         # Find the individual cells in each row, and iterate through them
         cell_tags = row_tags[row].find_all('c')
         for cell in range(len(cell_tags)):
+            
+            # Handle cells with no value
+            raw_cell_value = ''
+            if cell_tags[cell].find('v') != None:  
+                raw_cell_value = cell_tags[cell].find('v').text
+
+            # Handle cells with no style
+            raw_style_value = '0'
+            if cell_tags[cell].get('s') != None:  
+                raw_style_value = cell_tags[cell].get('s')
+
             cell_dict = {
-                'raw_value': cell_tags[cell].find('v').text,
-                'style_num': cell_tags[cell].get('s')
+                'raw_value': raw_cell_value,
+                'style_num': raw_style_value
             }
             if not cell_tags[cell].get('t') is None:  # Some cells have an optional 'Type' property, e.g. 's' = string
                 cell_dict.update({'type': cell_tags[cell].get('t')})
@@ -131,7 +142,7 @@ if __name__ == '__main__':
 
         # Display the data extracted from the sheet
         print(f'Sheet dimensions = {sheet_dimensions}')
-        cell_reference = 'A1'
+        cell_reference = 'A32'
         print(f'The raw values of cell {cell_reference} are: {sheet_contents[cell_reference]}')
         # N.B. Excel numbers values starting at 1 (or A), so the zeroth width and height are None to reduce the chance of errors
         print(f'Column widths of {name} in order are: {sheet_column_widths}')
