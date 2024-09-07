@@ -16,7 +16,7 @@ if __name__ == '__main__':
     # print(workbook_to_output)
 
     all_table_strings, all_extra_css = convert_data_to_html(workbook_to_output)
-    print(all_table_strings)
+    # print(all_table_strings)
 
     insert_table_into_template(html_template_file, all_table_strings)
 

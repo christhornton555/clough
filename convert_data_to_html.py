@@ -28,12 +28,15 @@ def convert_data_to_html(table_data):
         table_headers = table_data[sheet][0]
         table_headers_string = ''
         table_th_classes_string = f'clough-column-letters'
+
+        tab_offset = '\t\t'  # TODO - Set programmatically
+
         for table_header in table_headers:
-            table_headers_string += f'\t\t\t<th class="{table_th_classes_string}">{table_header}</th>\n'
+            table_headers_string += f'{tab_offset}\t\t\t<th class="{table_th_classes_string}">{table_header}</th>\n'
 
         table_body_string = ''
         for row in range(1, len(table_data[sheet])):  # Skip the first row which just has column labels A, B, C, etc
-            table_body_string += f'\t\t<tr class="{table_tr_classes_string}">\n'
+            table_body_string += f'{tab_offset}\t\t<tr class="{table_tr_classes_string}">\n'
 
             # Not all rows are going to be the same length, so grab that value now
             row_length = len(table_data[sheet][row])
@@ -52,32 +55,32 @@ def convert_data_to_html(table_data):
                         for bold_italic_underline_style in cell_metadata['font_style'].split():
                             table_td_classes_string += f' clough-font-{bold_italic_underline_style}'
 
-                    table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col][0]}</td>\n'
+                    table_body_string += f'{tab_offset}\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col][0]}</td>\n'
                 else:
                     table_td_classes_string = f'clough-row-numbers'  # 1st col is row numbers
-                    table_body_string += f'\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col]}</td>\n'
+                    table_body_string += f'{tab_offset}\t\t\t<td class="{table_td_classes_string}">{table_data[sheet][row][col]}</td>\n'
                 table_td_classes_string = ''  # Clear last values
-            table_body_string += f'\t\t</tr>\n'
+            table_body_string += f'{tab_offset}\t\t</tr>\n'
 
         table_foot_string = ''  # Not currently implemented - included for completeness
 
         full_table_string = (
-            f'<table class="clough {table_classes_string}" id="{sheet}" style="width:{table_style['width']}">\n'
-            f'\t<caption class="{table_caption_classes_string}">{table_style['caption']}</caption>\n'
-            f'\t<thead class="{table_head_classes_string}">\n'
-            f'\t\t<tr class="{table_tr_classes_string}">\n'
+            f'{tab_offset}<table class="clough {table_classes_string}" id="{sheet}" style="width:{table_style['width']}">\n'
+            f'{tab_offset}\t<caption class="{table_caption_classes_string}">{table_style['caption']}</caption>\n'
+            f'{tab_offset}\t<thead class="{table_head_classes_string}">\n'
+            f'{tab_offset}\t\t<tr class="{table_tr_classes_string}">\n'
             f'{table_headers_string}'
-            f'\t\t</tr>\n'
-            f'\t</thead>\n\n'
+            f'{tab_offset}\t\t</tr>\n'
+            f'{tab_offset}\t</thead>\n\n'
 
-            f'\t<tbody class="{table_body_classes_string}">\n'
+            f'{tab_offset}\t<tbody class="{table_body_classes_string}">\n'
             f'{table_body_string}'
-            f'\t</tbody>\n\n'
+            f'{tab_offset}\t</tbody>\n\n'
 
-            f'\t<tfoot class="{table_foot_classes_string}">\n'
+            f'{tab_offset}\t<tfoot class="{table_foot_classes_string}">\n'
             f'{table_foot_string}'
-            f'\t</tfoot>\n\n'
-            f'</table>\n'
+            f'{tab_offset}\t</tfoot>\n\n'
+            f'{tab_offset}</table>\n'
             )
 
         all_table_strings[sheet] = full_table_string
