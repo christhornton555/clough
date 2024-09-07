@@ -41,7 +41,7 @@ def convert_data_to_html(table_data):
             for col in range(row_length):
                 cell_metadata = ''
                 if col > 0:  # Ignore first column, which just has row numbers
-                    print(f'\n{number_to_excel_column(col)}{row}: {table_data[sheet][row][col]}')
+                    # print(f'\n{number_to_excel_column(col)}{row}: {table_data[sheet][row][col]}')
                     cell_metadata = table_data[sheet][row][col][1]
                     if 'horizontal_alignment' in cell_metadata:
                         table_td_classes_string = f'clough-align-{cell_metadata['horizontal_alignment']}'
