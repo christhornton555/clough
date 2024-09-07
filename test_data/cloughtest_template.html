@@ -24,7 +24,7 @@
             color: #fff;
             text-align: center;
             padding: 10px 0;
-            position: fixed;
+            /* position: fixed; */
             width: 100%;
             bottom: 0;
         }
@@ -38,6 +38,13 @@
             border-collapse: collapse;
             margin-top: 20px;
             font-size: small;
+            position: absolute;
+            top: 30;
+            left: 30;
+            border: 1px solid #ddd;
+        }
+        .clough-display_none {
+            display: none;
         }
         table, th, td {
             border: 1px solid #e0e0e0;
@@ -87,6 +94,29 @@
         .clough-align-left {
             text-align: left;
         }
+        .clough-tabs {
+            overflow: hidden;
+            background-color: #f1f1f1;
+            display: flex;
+        }
+        .clough-tab-link {
+            background-color: #ddd;
+            border: none;
+            outline: none;
+            cursor: pointer;
+            padding: 14px 16px;
+            font-size: 16px;
+            width: 100%;
+            text-align: center;
+        }
+        .clough-tab-link.active {
+            background-color: #ccc;
+        }
+        .clough-tab-content {
+            position: relative;
+            height: auto;
+        }
+
     </style>
 </head>
 <body>
@@ -112,6 +142,26 @@
     <footer>
         <p>&copy; 2024 Clough. All rights reserved.</p>
     </footer>
+
+
+    <!-- JavaScript goes here -->
+    <script>
+        function showTable(event, tableId) {
+            // Hide all tables
+            const tables = document.querySelectorAll('.tab-content table');
+            tables.forEach(table => table.style.display = 'none');
+
+            // Remove active class from all buttons
+            const tabLinks = document.querySelectorAll('.tab-link');
+            tabLinks.forEach(tab => tab.classList.remove('active'));
+
+            // Show the selected table
+            document.getElementById(tableId).style.display = 'table';
+
+            // Set the clicked tab to active
+            event.currentTarget.classList.add('active');
+        }
+    </script>
 
 </body>
 </html>
