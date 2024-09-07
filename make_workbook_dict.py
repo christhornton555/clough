@@ -97,8 +97,9 @@ def make_workbook_dict(input_file):
             if current_cell_type_ref == 's':
                 current_cell_display_value = get_string(int(sheet_contents[cell]['raw_value']), temp_archive_path)
 
-            # If style is not General (i.e. default, no styling), apply that style
-            if current_cell_num_style != 'General':
+            # print([cell, current_cell_display_value, current_cell_style_dict])
+            # If style is not General (i.e. default, no styling), apply that style (unless cell has no data value to apply it to)
+            if current_cell_num_style != 'General' and current_cell_display_value != '':
                 if standard_num_formats_dict[current_cell_style_dict['numFmtId']][0] == 'd-mmm-yy':
                     # Excel processes dates idiosynchratically, so we can't just apply the number format without fixing some stuff
                     # TODO - gonna need to apply this to all the other date formats I reckon, ugh. I might have half cracked it below, but need to check
