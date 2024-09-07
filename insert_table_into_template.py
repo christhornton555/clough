@@ -34,7 +34,13 @@ def insert_table_into_template(template_file, table_strings):
         except StopIteration:
             print('Error: no more sheets left')  # Should be unreachable
     
-    full_html = html_template_top + tables_to_insert + html_template_tail
+    tab_offset = '\t\t'  # TODO - Set programmatically
+    tabs_html = '''\n\n<div class="tabs">\n
+    <button class="tab-link active" onclick="showTable(event, 'Sheet1')">Table 1</button>\n
+    <button class="tab-link" onclick="showTable(event, 'Sheet2')">Table 2</button>\n
+    <button class="tab-link" onclick="showTable(event, 'Sheet3')">Table 3</button>\n
+    </div>\n\n'''
+    full_html = html_template_top + f'{tab_offset}<div class="spreadsheet-workbook">\n' + tables_to_insert + f'{tab_offset}</div>\n' + tabs_html + html_template_tail
 
     with open(output_file_path, 'w') as output_file:
         output_file.write(full_html)

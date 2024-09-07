@@ -65,22 +65,22 @@ def convert_data_to_html(table_data):
         table_foot_string = ''  # Not currently implemented - included for completeness
 
         full_table_string = (
-            f'{tab_offset}<table class="clough {table_classes_string}" id="{sheet}" style="width:{table_style['width']}">\n'
-            f'{tab_offset}\t<caption class="{table_caption_classes_string}">{table_style['caption']}</caption>\n'
-            f'{tab_offset}\t<thead class="{table_head_classes_string}">\n'
-            f'{tab_offset}\t\t<tr class="{table_tr_classes_string}">\n'
+            f'{tab_offset}\t<table class="clough {table_classes_string}" id="{sheet}" style="width:{table_style['width']}">\n'
+            f'{tab_offset}\t\t<caption class="{table_caption_classes_string}">{table_style['caption']}</caption>\n'
+            f'{tab_offset}\t\t<thead class="{table_head_classes_string}">\n'
+            f'{tab_offset}\t\t\t<tr class="{table_tr_classes_string}">\n'
             f'{table_headers_string}'
-            f'{tab_offset}\t\t</tr>\n'
-            f'{tab_offset}\t</thead>\n\n'
+            f'{tab_offset}\t\t\t</tr>\n'
+            f'{tab_offset}\t\t</thead>\n\n'
 
-            f'{tab_offset}\t<tbody class="{table_body_classes_string}">\n'
+            f'{tab_offset}\t\t<tbody class="{table_body_classes_string}">\n'
             f'{table_body_string}'
-            f'{tab_offset}\t</tbody>\n\n'
+            f'{tab_offset}\t\t</tbody>\n\n'
 
-            f'{tab_offset}\t<tfoot class="{table_foot_classes_string}">\n'
+            f'{tab_offset}\t\t<tfoot class="{table_foot_classes_string}">\n'
             f'{table_foot_string}'
-            f'{tab_offset}\t</tfoot>\n\n'
-            f'{tab_offset}</table>\n'
+            f'{tab_offset}\t\t</tfoot>\n\n'
+            f'{tab_offset}\t</table>\n'
             )
 
         all_table_strings[sheet] = full_table_string
