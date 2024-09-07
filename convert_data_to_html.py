@@ -1,6 +1,7 @@
 '''
 This script takes a dictionary containing a worksheet's data, and produces an HTML table of it
 '''
+from make_workbook_dict import number_to_excel_column
 
 def convert_data_to_html(table_data):
     table_style = {
@@ -33,9 +34,14 @@ def convert_data_to_html(table_data):
         table_body_string = ''
         for row in range(1, len(table_data[sheet])):  # Skip the first row which just has column labels A, B, C, etc
             table_body_string += f'\t\t<tr class="{table_tr_classes_string}">\n'
-            for col in range(sheet_columns):
+
+            # Not all rows are going to be the same length, so grab that value now
+            row_length = len(table_data[sheet][row])
+            # print(f'row len: {row_length}, {sheet_columns}')
+            for col in range(row_length):
                 cell_metadata = ''
                 if col > 0:  # Ignore first column, which just has row numbers
+                    print(f'\n{number_to_excel_column(col)}{row}: {table_data[sheet][row][col]}')
                     cell_metadata = table_data[sheet][row][col][1]
                     if 'horizontal_alignment' in cell_metadata:
                         table_td_classes_string = f'clough-align-{cell_metadata['horizontal_alignment']}'
