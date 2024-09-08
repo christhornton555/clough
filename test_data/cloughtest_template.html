@@ -163,8 +163,8 @@
             event.currentTarget.classList.add('active');
         }
         const all_tables = document.querySelectorAll('.clough-tabbable-table');
-        console.log(all_tables[0].id);
-        window.onload = showSheet(onclick, 'Sheet1');  // TODO - this is hacky, make it better
+        const first_sheet = all_tables[0].id
+        window.onload = showSheet(onclick, first_sheet);  // TODO - this is hacky, make it better
     </script>
 
 </body>
