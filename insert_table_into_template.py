@@ -38,7 +38,7 @@ def insert_table_into_template(template_file, table_strings):
             print('Error: no more sheets left')  # Should be unreachable
     
     tab_offset = '\t\t'  # TODO - Set programmatically
-    full_html = html_template_top + f'{tab_offset}<div class="spreadsheet-workbook">\n' + tables_to_insert + f'{tab_offset}</div>\n' + workbook_tabs_html + html_template_tail
+    full_html = html_template_top + f'{tab_offset}<div class="spreadsheet-workbook clough-table-container">\n' + tables_to_insert + f'{tab_offset}</div>\n' + workbook_tabs_html + html_template_tail
 
     with open(output_file_path, 'w') as output_file:
         output_file.write(full_html)
