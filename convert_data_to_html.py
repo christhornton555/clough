@@ -24,7 +24,7 @@ def convert_data_to_html(table_data):
             table_classes_string = 'clough-tabbable-table'  # TODO - do i need to set a display-none class here?
         else:
             table_classes_string = 'clough-tabbable-table'
-        table_caption_classes_string = ''
+        table_caption_classes_string = 'clough-table-caption'
         table_head_classes_string = ''
         table_body_classes_string = ''
         table_foot_classes_string = ''

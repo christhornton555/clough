@@ -27,7 +27,7 @@ def insert_table_into_template(template_file, table_strings):
     tables_to_insert = table_strings[first_sheet_in_table]
     html_template_top, html_template_tail = split_template(template_file)
     # TODO - Need to sort out the classes for these buttons - clough-specific classes are hiding them. Using a local style for now
-    workbook_tabs_html = f'''\n\n{tab_offset}<div class="tabs" style="padding-left: 150px;">\n
+    workbook_tabs_html = f'''\n\n{tab_offset}<div class="clough-tabs" style="padding-left: 150px;">\n
     {tab_offset}<button class="tab-link active" onclick="showSheet(event, '{first_sheet_in_table}')">{first_sheet_in_table}</button>\n'''
 
     # Now use the iterator to add sheets after the first one, if there are any

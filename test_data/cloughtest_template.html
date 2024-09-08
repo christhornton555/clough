@@ -37,11 +37,11 @@
             padding: 0;
             background-color: #ffffff;
             border-collapse: collapse;
-            margin-top: 20px;
+            /* margin-top: 20px; */
             font-size: small;
             position: absolute;
-            top: 30;
-            left: 30;
+            top: 0;
+            left: 0;
             border: 1px solid #ddd;
         }
         table[style="display:none;"] {
@@ -72,6 +72,9 @@
         }
         th:first-child {
             z-index: 3;
+        }
+        .clough-table-caption {
+            display: none;  /* Just hide this for now - TODO - decide later whether to use this */
         }
         .clough-table-container {
             width: 80vw;  /* 80% of the viewport width */
@@ -118,9 +121,9 @@
             text-align: left;
         }
         .clough-tabs {
-            overflow: hidden;
+            /* overflow: hidden;
             background-color: #f1f1f1;
-            display: flex;
+            display: flex; */
         }
         .clough-tab-link {
             background-color: #ddd;
