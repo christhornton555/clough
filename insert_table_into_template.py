@@ -27,15 +27,15 @@ def insert_table_into_template(template_file, table_strings):
     tables_to_insert = table_strings[first_sheet_in_table]
     html_template_top, html_template_tail = split_template(template_file)
     # TODO - Need to sort out the classes for these buttons - clough-specific classes are hiding them. Using a local style for now
-    workbook_tabs_html = f'''\n\n{tab_offset}<div class="clough-tabs" style="padding-left: 150px;">\n
-    {tab_offset}<button class="tab-link active" onclick="showSheet(event, '{first_sheet_in_table}')">{first_sheet_in_table}</button>\n'''
+    workbook_tabs_html = f'''\n\n{tab_offset}<div class="clough-tabs">\n
+    {tab_offset}<button class="clough-tab-link" id="FirstSheet" onclick="showSheet(event, '{first_sheet_in_table}')">{first_sheet_in_table}</button>\n'''
 
     # Now use the iterator to add sheets after the first one, if there are any
     if len(table_strings) > 1:
         try:
             for sheet_name in sheet_key_iterator:
                 tables_to_insert += f'\n\n{table_strings[sheet_name]}'  # TODO - it turns out all sheets are named Sheet1, Sheet2, etc. Aliases are in workbook.xml
-                workbook_tabs_html += f'''{tab_offset}\t<button class="tab-link" onclick="showSheet(event, '{sheet_name}')">{sheet_name}</button>\n'''
+                workbook_tabs_html += f'''{tab_offset}\t<button class="clough-tab-link" onclick="showSheet(event, '{sheet_name}')">{sheet_name}</button>\n'''
         except StopIteration:
             print('Error: no more sheets left')  # Should be unreachable
     workbook_tabs_html += f'\n{tab_offset}</div>\n'

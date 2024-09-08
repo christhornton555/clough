@@ -37,7 +37,6 @@
             padding: 0;
             background-color: #ffffff;
             border-collapse: collapse;
-            /* margin-top: 20px; */
             font-size: small;
             position: absolute;
             top: 0;
@@ -121,22 +120,28 @@
             text-align: left;
         }
         .clough-tabs {
-            /* overflow: hidden;
-            background-color: #f1f1f1;
-            display: flex; */
+            padding-left: 250px;
         }
         .clough-tab-link {
-            background-color: #ddd;
-            border: none;
-            outline: none;
-            cursor: pointer;
-            padding: 14px 16px;
-            font-size: 16px;
-            width: 100%;
+            background-color: #fd83ed;
+            border: 1px solid #ccc;
+            color: black;
+            padding: 6px 9px;
+            font-size: small;
             text-align: center;
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-top: none;        /* No top border for the flat look */
+            cursor: pointer;            /* Pointer cursor */
+            position: relative;
+            top: 0px;
         }
         .clough-tab-link.active {
-            background-color: #ccc;
+            background-color: white;
+            font-weight: bold;
+            text-decoration: underline;
+            text-decoration-color: green;
+            text-decoration-thickness: 2px;
         }
         .clough-tabbable-table {
             position: relative;
@@ -172,25 +177,40 @@
 
     <!-- JavaScript goes here -->
     <script>
+        // Find the background colour of the <main> element - TODO - add a check for which is the parent element
+        const parentBackgroundColor = window.getComputedStyle(document.querySelector('main')).backgroundColor;
+        const tabLinks = document.querySelectorAll('.clough-tab-link');
+
         function showSheet(event, tableId) {
             // Hide all tables
             const tables = document.querySelectorAll('.clough-tabbable-table');
-            // console.log(tables[0].id);
             tables.forEach(table => table.style.display = 'none');
             
             // Remove active class from all buttons
-            const tabLinks = document.querySelectorAll('.tab-link');
             tabLinks.forEach(tab => tab.classList.remove('active'));
+
+            // Loop through each element in the NodeList
+            tabLinks.forEach(function(link) {
+                link.style.backgroundColor = parentBackgroundColor; // Set background color to same as parent
+            });
 
             // Show the selected table
             document.getElementById(tableId).style.display = 'table';
 
             // Set the clicked tab to active
             event.currentTarget.classList.add('active');
-        }
-        const all_tables = document.querySelectorAll('.clough-tabbable-table');
-        const first_sheet = all_tables[0].id
-        window.onload = showSheet(onclick, first_sheet);  // TODO - this is hacky, make it better
+            event.currentTarget.style.backgroundColor = 'white';
+        };
+
+        // Style the first tab as active when the page loads
+        window.onload = function() {
+            // Loop through each element in the NodeList
+            tabLinks.forEach(function(link) {
+                link.style.backgroundColor = parentBackgroundColor; // Set background color to same as parent
+            });
+            document.getElementById('FirstSheet').classList.add('active');
+            document.getElementById('FirstSheet').style.backgroundColor = 'white';
+        };
     </script>
 
 </body>
