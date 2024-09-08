@@ -27,8 +27,8 @@ def insert_table_into_template(template_file, table_strings):
     tables_to_insert = table_strings[first_sheet_in_table]
     html_template_top, html_template_tail = split_template(template_file)
     # TODO - Need to sort out the classes for these buttons - clough-specific classes are hiding them. Using a local style for now
-    workbook_tabs_html = f'''{tab_offset}\n\n<div class="tabs" style="padding-left: 150px;">\n
-    {tab_offset}\t<button class="tab-link active" onclick="showSheet(event, '{first_sheet_in_table}')">{first_sheet_in_table}</button>\n'''
+    workbook_tabs_html = f'''\n\n{tab_offset}<div class="tabs" style="padding-left: 150px;">\n
+    {tab_offset}<button class="tab-link active" onclick="showSheet(event, '{first_sheet_in_table}')">{first_sheet_in_table}</button>\n'''
 
     # Now use the iterator to add sheets after the first one, if there are any
     if len(table_strings) > 1:
@@ -38,6 +38,7 @@ def insert_table_into_template(template_file, table_strings):
                 workbook_tabs_html += f'''{tab_offset}\t<button class="tab-link" onclick="showSheet(event, '{sheet_name}')">{sheet_name}</button>\n'''
         except StopIteration:
             print('Error: no more sheets left')  # Should be unreachable
+    workbook_tabs_html += f'\n{tab_offset}</div>\n'
 
     full_html = html_template_top + f'{tab_offset}<div class="spreadsheet-workbook clough-table-container">\n' + tables_to_insert + f'{tab_offset}</div>\n' + workbook_tabs_html + html_template_tail
 
