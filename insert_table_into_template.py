@@ -17,6 +17,7 @@ def split_template(template_file_path):
 
 def insert_table_into_template(template_file, table_strings):
     current_time = get_current_time_string()
+    tab_offset = '\t\t'  # TODO - Set programmatically
     output_file_path = f'test_data/output/cloughtest_output.html'  # {current_time}_  TODO - add this prefix back in
 
     sheet_key_iterator = iter(table_strings)
@@ -25,19 +26,19 @@ def insert_table_into_template(template_file, table_strings):
     # Need to process first sheet separately to create tables_to_insert for later additions from other sheets
     tables_to_insert = table_strings[first_sheet_in_table]
     html_template_top, html_template_tail = split_template(template_file)
-    workbook_tabs_html = f'''\n\n<div class="tabs">\n
-    <button class="tab-link active" onclick="showSheet(event, '{first_sheet_in_table}')">{first_sheet_in_table}</button>\n'''
+    # TODO - Need to sort out the classes for these buttons - clough-specific classes are hiding them. Using a local style for now
+    workbook_tabs_html = f'''{tab_offset}\n\n<div class="tabs" style="padding-left: 150px;">\n
+    {tab_offset}\t<button class="tab-link active" onclick="showSheet(event, '{first_sheet_in_table}')">{first_sheet_in_table}</button>\n'''
 
     # Now use the iterator to add sheets after the first one, if there are any
     if len(table_strings) > 1:
         try:
             for sheet_name in sheet_key_iterator:
-                tables_to_insert += f'\n\n{table_strings[sheet_name]}'
-                workbook_tabs_html += f'''<button class="tab-link" onclick="showSheet(event, '{sheet_name}')">{sheet_name}</button>\n'''
+                tables_to_insert += f'\n\n{table_strings[sheet_name]}'  # TODO - it turns out all sheets are named Sheet1, Sheet2, etc. Aliases are in workbook.xml
+                workbook_tabs_html += f'''{tab_offset}\t<button class="tab-link" onclick="showSheet(event, '{sheet_name}')">{sheet_name}</button>\n'''
         except StopIteration:
             print('Error: no more sheets left')  # Should be unreachable
-    
-    tab_offset = '\t\t'  # TODO - Set programmatically
+
     full_html = html_template_top + f'{tab_offset}<div class="spreadsheet-workbook clough-table-container">\n' + tables_to_insert + f'{tab_offset}</div>\n' + workbook_tabs_html + html_template_tail
 
     with open(output_file_path, 'w') as output_file:
