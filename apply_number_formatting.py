@@ -2,11 +2,14 @@ from datetime import datetime, timedelta
 from fractions import Fraction
 
 def apply_excel_numFmtId(value, numFmtId):
-    # TODO - add a type-check to convert inputs to ints/floats if necessary
+    # TODO - add a type-check to convert value to int/floats if necessary
+    # TODO - gonna need some kind of localisation check, expecially for dates & currency, as Excel evidently handles that automatically
 
+    numFmtId = int(numFmtId)
+    
     # Several formats use dates, so do the core conversion here:
     base_date = datetime(1899, 12, 30)  # Excel uses 1900-based system (-1, cos they got their leap years wrong)
-    date_value = base_date + timedelta(days=value)
+    date_value = base_date + timedelta(days=int(value))
 
     if numFmtId == 0:  # General number format (just return as is)
         if isinstance(value, float):
@@ -50,11 +53,18 @@ def apply_excel_numFmtId(value, numFmtId):
 
     elif numFmtId == 14:  # Date format (typically short date in Excel)
         # Assuming `value` is a float representing Excel date (days since 1900)
+        # TODO - add in a way to handle dates before 02-01-1900
         return date_value.strftime('%m-%d-%y')  # Format to MM-DD-YY
     
     elif numFmtId == 15:  # Date format (typically short date in Excel)
         # Assuming `value` is a float representing Excel date (days since 1900)
+        # TODO - add in a way to handle dates before 02-01-1900
         return date_value.strftime('%d-%b-%y')  # Format as "DD-mmm-YYY"
+    
+    elif numFmtId == 16:  # Date format (typically short date in Excel)
+        # Assuming `value` is a float representing Excel date (days since 1900)
+        # TODO - add in a way to handle dates before 02-01-1900
+        return date_value.strftime('%d-%b')  # Format as "DD-mmm-YYY"
 
     elif numFmtId == 21:  # Time format
         hours = int(value * 24)
@@ -71,8 +81,8 @@ def apply_excel_numFmtId(value, numFmtId):
 if __name__ == '__main__':
     print('   --- START ---')
 
-    num_format_reference = 14
-    test_value = 0.8
+    num_format_reference = 11
+    test_value = 2
 
     formatted_number = apply_excel_numFmtId(test_value, num_format_reference)
     

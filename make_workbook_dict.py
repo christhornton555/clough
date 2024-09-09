@@ -9,6 +9,7 @@ from get_strings_using_string_references import get_string
 from convert_sheet_dimensions_to_list import dimensions_to_list, split_cell_reference_into_rows_and_columns
 from get_styles_using_style_references import get_style
 from get_num_formats_using_num_format_references import make_num_formats_dict
+from apply_number_formatting import apply_excel_numFmtId
 # TODO - do I need: from fractions import Fraction
 
 
@@ -30,7 +31,7 @@ def number_to_excel_column(n):
 
 # Pull the data, styling info, etc from the various XML files it's stored in, and create a dict of tables for the whole workbook
 def make_workbook_dict(input_file):
-    standard_num_formats_dict = make_num_formats_dict()
+    # standard_num_formats_dict = make_num_formats_dict() - TODO - remove this module now it's no longer in use
     temp_archive_path = unzip_xlsx_file(input_file)
 
     sheets_in_workbook = get_sheets_info(temp_archive_path)
@@ -84,7 +85,7 @@ def make_workbook_dict(input_file):
             # Convert style ref to actual style
             current_cell_style_dict = get_style(int(current_cell_style_ref), temp_archive_path)
             # print(current_cell_style_dict)
-            current_cell_num_style = standard_num_formats_dict[current_cell_style_dict['numFmtId']][1]
+            current_cell_num_style = current_cell_style_dict['numFmtId']
             # print(current_cell_num_style)
 
             # Check if cell has a type specified (e.g. 's' for string)
@@ -102,21 +103,8 @@ def make_workbook_dict(input_file):
 
             # print([cell, current_cell_display_value, current_cell_style_dict])
             # If style is not General (i.e. default, no styling), apply that style (unless cell has no data value to apply it to)
-            if current_cell_num_style != 'General' and current_cell_display_value != '':
-                if standard_num_formats_dict[current_cell_style_dict['numFmtId']][0] == 'd-mmm-yy':
-                    # Excel processes dates idiosynchratically, so we can't just apply the number format without fixing some stuff
-                    # TODO - gonna need to apply this to all the other date formats I reckon, ugh. I might have half cracked it below, but need to check
-                    # Excel's date system starts on 1900-01-01
-                    # Subtract 1 because Excel incorrectly treats 1900 as a leap year
-                    base_date = datetime(1899, 12, 30)
-
-                    excel_date = int(current_cell_raw_value)  # Date should be in Excel serial date format, e.g. 45123 = 16/07/2023
-
-                    # Convert the serial date to a datetime object
-                    converted_date = base_date + timedelta(days=excel_date)
-
-                    # Apply the desired format
-                    current_cell_display_value = converted_date.strftime(current_cell_num_style)
+            if current_cell_num_style != '0' and current_cell_display_value != '':
+                current_cell_display_value = apply_excel_numFmtId(current_cell_display_value, current_cell_num_style)
 
             current_cell_display = f'{current_cell_display_value}'
             workbook[alias][int(current_row)].append([current_cell_display, current_cell_style_dict])
