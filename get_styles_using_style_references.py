@@ -27,8 +27,13 @@ def get_style(style_ref, archive_path):
         'numFmtId': style_tags[style_ref].get('numFmtId')
     }
 
-    if alignment_tags[style_ref-1].get('horizontal') != None:
-        output_dict['horizontal_alignment'] = alignment_tags[style_ref-1].get('horizontal')  # 1st (default) <xf> tag has no <alignment> sub-tag, hence ref-1
+    
+    try:
+        if alignment_tags[style_ref-1].get('horizontal') != None:
+            output_dict['horizontal_alignment'] = alignment_tags[style_ref-1].get('horizontal')  # 1st (default) <xf> tag has no <alignment> sub-tag, hence ref-1
+    except IndexError:
+        print(f'Index error - {alignment_tags}, {len(alignment_tags)}, {style_ref-1}')
+
     
     # Add font styles (bold, italic, underline) if present
     output_dict['font_style'] = ''

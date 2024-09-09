@@ -64,7 +64,7 @@ def apply_excel_numFmtId(value, numFmtId):
     elif numFmtId == 16:  # Date format (typically short date in Excel)
         # Assuming `value` is a float representing Excel date (days since 1900)
         # TODO - add in a way to handle dates before 02-01-1900
-        return date_value.strftime('%d-%b')  # Format as "DD-mmm-YYY"
+        return date_value.strftime('%d-%b')  # Format as "DD-mmm"
 
     elif numFmtId == 21:  # Time format
         hours = int(value * 24)
