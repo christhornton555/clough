@@ -6,7 +6,7 @@ def apply_excel_numFmtId(value, numFmtId):
     # TODO - gonna need some kind of localisation check, expecially for dates & currency, as Excel evidently handles that automatically
 
     numFmtId = int(numFmtId)
-    
+
     # Several formats use dates, so do the core conversion here:
     base_date = datetime(1899, 12, 30)  # Excel uses 1900-based system (-1, cos they got their leap years wrong)
     date_value = base_date + timedelta(days=int(value))
@@ -71,6 +71,9 @@ def apply_excel_numFmtId(value, numFmtId):
         minutes = int((value * 24 * 60) % 60)
         seconds = int((value * 24 * 3600) % 60)
         return f"{hours:02}:{minutes:02}:{seconds:02}"
+
+    elif numFmtId == 165:  # Format = DD/MM/YY
+        return date_value.strftime('%d/%m/%y')  # Format to DD/MM/YY
 
     else:
         print(f"Unsupported numFmtId: {numFmtId}")
