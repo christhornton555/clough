@@ -38,12 +38,14 @@ def make_workbook_dict(input_file):
 
     # Extract the raw data from each sheet
     for sheet in sheets_in_workbook:
-        name = sheet.get('name')
-        sheet_id = sheet.get('sheetId')
+        alias = sheet.get('name')
+        sheet_id = sheet.get('sheetId')  # Chronological numbering based upon sheet creation
+        sheet_r_id = sheet.get('r:id')  # Order of sheets in workbook (always sequential)
+        sheet_number = f'Sheet{sheet_r_id.replace("rId", "")}'
 
-        workbook[name] = []
+        workbook[alias] = []
 
-        sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(name, temp_archive_path)
+        sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(sheet_number, temp_archive_path)
 
         # print(sheet_column_widths)
         # print(sheet_row_heights)
@@ -56,12 +58,12 @@ def make_workbook_dict(input_file):
         - int(dimensions_to_list(sheet_dimensions)[0][1]) + 2  # +1 for 1st col & +1 for row/col reference
 
         # Set up an array for the sheet, and label the data columns
-        workbook[name].append([])
+        workbook[alias].append([])
         for c in range(number_of_columns + 1):
             if c == 0:
-                workbook[name][0].append('')  # First column is for row numbers, not data. Also avoids zeroth offset problems
+                workbook[alias][0].append('')  # First column is for row numbers, not data. Also avoids zeroth offset problems
             else:
-                workbook[name][0].append(number_to_excel_column(c))
+                workbook[alias][0].append(number_to_excel_column(c))
 
         # This is where the magic happens - use the references in each cell to strings & styles to populate the sheet array
         last_row_filled = 0
@@ -72,7 +74,7 @@ def make_workbook_dict(input_file):
             # Create and number a new row when data read in from Excel starts a new row
             if int(current_row) > last_row_filled:
                 last_row_filled = int(current_row)
-                workbook[name].append([int(current_row)])
+                workbook[alias].append([int(current_row)])
 
             # Find relevant values for cell contents and attributes - TODO - make this into a function?
             current_cell_raw_value = sheet_contents[cell]['raw_value']
@@ -116,7 +118,7 @@ def make_workbook_dict(input_file):
                     current_cell_display_value = converted_date.strftime(current_cell_num_style)
 
             current_cell_display = f'{current_cell_display_value}'
-            workbook[name][int(current_row)].append([current_cell_display, current_cell_style_dict])
+            workbook[alias][int(current_row)].append([current_cell_display, current_cell_style_dict])
 
     shutil.rmtree(temp_archive_path)  # Tidy up by deleting the temp unzipped archive
 

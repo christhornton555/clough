@@ -58,8 +58,8 @@ def get_sheets_info(archive_path):
 
 
 # Read contents of individual sheet
-def read_sheet_contents(sheet_name, archive_path):
-    sheet_path = f'{archive_path}/xl/worksheets/{sheet_name}.xml'
+def read_sheet_contents(sheet_num, archive_path):
+    sheet_path = f'{archive_path}/xl/worksheets/{sheet_num}.xml'
     with open(sheet_path, 'r') as sheet_file:
         sheet_xml_data = sheet_file.read()
 
@@ -135,17 +135,19 @@ if __name__ == '__main__':
     
     # Extract the raw data from each sheet
     for sheet in sheets_in_workbook:
-        name = sheet.get('name')
+        alias = sheet.get('name')
         sheet_id = sheet.get('sheetId')
-        print(f'Sheet Name: {name}, Sheet ID: {sheet_id}')
-        sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(name, temp_archive_path)
+        sheet_r_id = sheet.get('r:id')
+        sheet_number = f'Sheet{sheet_r_id.replace("rId", "")}'
+        print(f'Sheet Name: {alias}, Sheet ID: {sheet_id}, Sheet R:ID: {sheet_r_id}')
+        sheet_dimensions, sheet_contents, sheet_column_widths, sheet_row_heights = read_sheet_contents(sheet_number, temp_archive_path)
 
         # Display the data extracted from the sheet
         print(f'Sheet dimensions = {sheet_dimensions}')
-        cell_reference = 'A32'
+        cell_reference = 'A10'
         print(f'The raw values of cell {cell_reference} are: {sheet_contents[cell_reference]}')
         # N.B. Excel numbers values starting at 1 (or A), so the zeroth width and height are None to reduce the chance of errors
-        print(f'Column widths of {name} in order are: {sheet_column_widths}')
-        print(f'Row heights of {name} in order are: {sheet_row_heights}')
+        print(f'Column widths of {alias} in order are: {sheet_column_widths}')
+        print(f'Row heights of {alias} in order are: {sheet_row_heights}')
 
     print('   --- END ---')

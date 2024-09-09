@@ -181,12 +181,12 @@
     <!-- JavaScript goes here -->
     <script>
         // Find the background colour of the <main> element - TODO - add a check for which is the parent element
-        const parentBackgroundColor = window.getComputedStyle(document.querySelector('main')).backgroundColor;
+            const parentBackgroundColor = window.getComputedStyle(document.querySelector('main')).backgroundColor;
         const tabLinks = document.querySelectorAll('.clough-tab-link');
+		const tables = document.querySelectorAll('.clough-tabbable-table');
 
         function showSheet(event, tableId) {
             // Hide all tables
-            const tables = document.querySelectorAll('.clough-tabbable-table');
             tables.forEach(table => table.style.display = 'none');
             
             // Remove active class from all buttons
@@ -211,6 +211,12 @@
             tabLinks.forEach(function(link) {
                 link.style.backgroundColor = parentBackgroundColor; // Set background color to same as parent
             });
+			
+            // Hide all tables
+            tables.forEach(table => table.style.display = 'none');
+            // Show the first table
+            document.getElementById(tables[0].id).style.display = 'table';
+
             document.getElementById('FirstSheet').classList.add('active');
             document.getElementById('FirstSheet').style.backgroundColor = 'white';
         };
