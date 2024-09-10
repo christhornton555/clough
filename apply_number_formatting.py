@@ -2,12 +2,31 @@ from datetime import datetime, timedelta
 from fractions import Fraction
 
 def convert_custom_formats(value, numFmtId):
+    value = '6516516516351.1'
     numFmtId = '0.00'
+    type = ''
+
+    # Check if int or float
+    try:
+        int_value = int(value)
+        type = 'int'
+    except ValueError:
+        # If it raises a ValueError, it's not an int
+        pass
+    
+    # Try to convert to float
+    try:
+        float_value = float(value)
+        type = 'float'
+    except ValueError:
+        # If it raises a ValueError, it's not a float
+        pass
+
     if '.' in str(numFmtId):
         decimal_split_numFmtId = str(numFmtId).split('.')  # TODO - this is only going to work for formats with exactly one '.'
-        print(f'decimal, {len(decimal_split_numFmtId[1])}d.p.')
+        print(f'decimal, {type}, {len(decimal_split_numFmtId[1])}d.p.')
     else:
-        print('int?')
+        print(f'int? {type}')
 
 
 def apply_excel_numFmtId(value, numFmtId):
