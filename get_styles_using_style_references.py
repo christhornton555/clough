@@ -26,6 +26,8 @@ def get_style(style_ref, archive_path):
     output_dict = {
         'numFmtId': style_tags[style_ref].get('numFmtId')
     }
+    if int(output_dict['numFmtId']) > 49:
+        print(f'Full style: {style_tags[style_ref]}')
 
     
     try:

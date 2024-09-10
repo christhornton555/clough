@@ -105,6 +105,8 @@ def make_workbook_dict(input_file):
             # If style is not General (i.e. default, no styling), apply that style (unless cell has no data value to apply it to)
             if current_cell_num_style != '0' and current_cell_display_value != '':
                 current_cell_display_value = apply_excel_numFmtId(current_cell_display_value, current_cell_num_style)
+                if int(current_cell_num_style) > 49:
+                    print(current_cell_style_dict)
 
             current_cell_display = f'{current_cell_display_value}'
             workbook[alias][int(current_row)].append([current_cell_display, current_cell_style_dict])
@@ -118,6 +120,6 @@ if __name__ == '__main__':
 
     file_to_read = r'test_data/test_sheet_01.xlsx'
     workbook_to_output = make_workbook_dict(file_to_read)
-    print(workbook_to_output)
+    # print(workbook_to_output)
 
     print('   --- END ---')
