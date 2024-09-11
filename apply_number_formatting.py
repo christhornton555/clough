@@ -38,7 +38,6 @@ def convert_custom_formats():  #(value, numFmt):
             numFmt_dict['negNumFmt'] = {'numFmt_str': semicolon_split_numFmt[1]}
         if len(semicolon_split_numFmt) >= 3:
             numFmt_dict['zeroNumFmt'] = {'numFmt_str': semicolon_split_numFmt[2]}
-            print(numFmt_dict)
         if len(semicolon_split_numFmt) == 4:
             numFmt_dict['textNumFmt'] = {'numFmt_str': semicolon_split_numFmt[3]}
         if len(semicolon_split_numFmt) > 4:
@@ -99,7 +98,8 @@ def convert_custom_formats():  #(value, numFmt):
             numFmt_dict[fmt]['numFmt_str'] = parentheses.group(1)
         
         # ---STEP 7---
-        # Detect and strip currency symbols. Assume there's only going to be one per numFmt as it's invalid otherwise
+        # Detect and strip currency symbols.
+        # Assume there's only going to be one per numFmt as it's invalid otherwise
         currency_pattern = r'[\$\€\£\¥\₹\₽\₩\₪]'  # Add additional currency symbols here if needed
         currencies = re.search(currency_pattern, numFmt_dict[fmt]['numFmt_str'])
         if currencies:
@@ -107,10 +107,12 @@ def convert_custom_formats():  #(value, numFmt):
             numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(currencies.group(), '')
         
         # ---STEP 8---
-        # Detect and strip negative symbols. Assume there's only going to be one per numFmt in position [0] as it's invalid otherwise
-        if numFmt_dict[fmt]['numFmt_str'][0] == '-':
-            numFmt_dict[fmt]['negative'] = True
-            numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'][1:]
+        # Detect and strip negative symbols.
+        # Assume there's only going to be one per numFmt, & in position [0], as it's invalid otherwise
+        if len(numFmt_dict[fmt]['numFmt_str']) > 0:  # numFmt can have zero length if there's no entry
+            if numFmt_dict[fmt]['numFmt_str'][0] == '-':
+                numFmt_dict[fmt]['negative'] = True
+                numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'][1:]
         
         # ---STEP 9---
         # Detect decimal point if present, and split numFmt, to give number of decimal places
@@ -127,8 +129,11 @@ def convert_custom_formats():  #(value, numFmt):
         
         # ---STEP 10---
         # Detect and strip leading hashes indicating thousands separators or similar
-        if numFmt_dict[fmt]['numFmt_str'][0] == '#':
-            pass
+        if len(numFmt_dict[fmt]['numFmt_str']) > 0:  # numFmt can have zero length if there's no entry
+            if numFmt_dict[fmt]['numFmt_str'][0] == '#':
+                # Regular expression to find hash pattern
+                numFmt_dict[fmt]['hashes'] = re.findall(r'\D+', numFmt_dict[fmt]['numFmt_str'])[0]  # Find sequences of non-digits
+                numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(numFmt_dict[fmt]['hashes'], '')
 
 
     for number_format in numFmt_dict:
