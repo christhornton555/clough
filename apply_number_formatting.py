@@ -1,32 +1,161 @@
 from datetime import datetime, timedelta
 from fractions import Fraction
+import re
 
-def convert_custom_formats(value, numFmtId):
+
+# Function systematically strips custom number formats down into their component parts so that they can be interpreted by python
+def convert_custom_formats():  #(value, numFmt):
+    #import re
     value = '6516516516351.1'
-    numFmtId = '0.00'
+    numFmt = '[Blue]_G£#,##0.00_);[Red](-$#,##0.00)_@" foo ";0.00;"sales "@" foo foo "'
     type = ''
 
-    # Check if int or float
-    try:
-        int_value = int(value)
-        type = 'int'
-    except ValueError:
-        # If it raises a ValueError, it's not an int
-        pass
+    # Number formatting guidance from https://support.microsoft.com/en-gb/office/review-guidelines-for-customizing-a-number-format-c0a1d1fa-d3f4-4018-96b7-9c9354dd99f5
     
-    # Try to convert to float
-    try:
-        float_value = float(value)
-        type = 'float'
-    except ValueError:
-        # If it raises a ValueError, it's not a float
-        pass
-
-    if '.' in str(numFmtId):
-        decimal_split_numFmtId = str(numFmtId).split('.')  # TODO - this is only going to work for formats with exactly one '.'
-        print(f'decimal, {type}, {len(decimal_split_numFmtId[1])}d.p.')
+    # ---STEP 1---
+    # A number format can have up to four sections of code, separated by semicolons.
+    # These code sections define the format for positive numbers, negative numbers, zero values, and text, in that order:
+    # <POSITIVE>;<NEGATIVE>;<ZERO>;<TEXT>
+    # Detect semicolons and split:
+    if ';' in str(numFmt):
+        semicolon_split_numFmt = str(numFmt).split(';')
     else:
-        print(f'int? {type}')
+        semicolon_split_numFmt = []
+        semicolon_split_numFmt.append(str(numFmt))
+
+    # ---STEP 2---
+    # You do not have to include all code sections in your custom number format.
+    # If you specify only one code section, it is used for all numbers.
+    # If you specify only two code sections for your custom number format, the first 
+    # section is used for positive numbers and zeros, and the second section is used for negative numbers.
+    if len(semicolon_split_numFmt) < 1:
+        print(f'Invalid number format: {numFmt}')
+        return value
+    else:
+        len(semicolon_split_numFmt)
+        numFmt_dict = {'posNumFmt': {'numFmt_str': semicolon_split_numFmt[0]}}
+        if len(semicolon_split_numFmt) >= 2:
+            numFmt_dict['negNumFmt'] = {'numFmt_str': semicolon_split_numFmt[1]}
+        if len(semicolon_split_numFmt) >= 3:
+            numFmt_dict['zeroNumFmt'] = {'numFmt_str': semicolon_split_numFmt[2]}
+            print(numFmt_dict)
+        if len(semicolon_split_numFmt) == 4:
+            numFmt_dict['textNumFmt'] = {'numFmt_str': semicolon_split_numFmt[3]}
+        if len(semicolon_split_numFmt) > 4:
+            print(f'Invalid number format: {numFmt}')
+
+    for fmt in numFmt_dict:
+        # print(numFmt_dict[fmt]['numFmt_str'])
+        # TODO - check that numFmt_dict[fmt]['numFmt_str'] exists & isn't blank
+
+        # ---STEP 3---
+        # Check colours and list in dict, and strip from numFmt_str. N.B. Excel puts colours in square brackets
+        # Should only be a single colour per numFmt
+        colour = re.search(r'\[(.*?)\]', numFmt_dict[fmt]['numFmt_str'])
+        if colour:
+            numFmt_dict[fmt]['colour'] = colour.group(1)
+            numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(f'[{colour.group(1)}]', '')
+
+        # ---STEP 4---
+        # Check padding/spacing and list in dict, and strip from numFmt_str.
+        # N.B. Excel uses width of char after underscore to pad
+        # Can potentially be multiple paddings in a single numFmt
+        len_padded_numFmt_str = len(numFmt_dict[fmt]['numFmt_str'])
+        paddings = re.finditer(r'_(.)', numFmt_dict[fmt]['numFmt_str'])
+        if paddings:
+            numFmt_dict[fmt]['paddings'] = []
+            for padding in paddings:
+                numFmt_dict[fmt]['paddings'].append([padding.group(1), padding.start(), len_padded_numFmt_str])  # Also returns position of padding in numFmt_str
+        # Now strip padding from numFmt_str
+        if len(numFmt_dict[fmt]['paddings']) > 0:
+            for padding in numFmt_dict[fmt]['paddings']:
+                numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(f'_{padding[0]}', '')
+        else:
+            del numFmt_dict[fmt]['paddings']  # Remove if empty
+
+        # ---STEP 5---
+        # Check for text strings and list in dict, and strip from numFmt_str. Similar to Step 4
+        # N.B. Excel uses double quotes for text strings in numFmts
+        # Can potentially be multiple text strings in a single numFmt
+        len_text_strings_numFmt_str = len(numFmt_dict[fmt]['numFmt_str'])
+        text_strings = re.finditer(r'"(.*?)"', numFmt_dict[fmt]['numFmt_str'])
+        if text_strings:
+            numFmt_dict[fmt]['text_strings'] = []
+            for text_string in text_strings:
+                numFmt_dict[fmt]['text_strings'].append([text_string.group(1), text_string.start(), len_text_strings_numFmt_str])
+        # Now strip text_string from numFmt_str
+        if len(numFmt_dict[fmt]['text_strings']) > 0:
+            for text_string in numFmt_dict[fmt]['text_strings']:
+                numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(f'"{text_string[0]}"', '')
+        else:
+            del numFmt_dict[fmt]['text_strings']  # Remove if empty
+        
+        # ---STEP 6---
+        # numFmt strings can be wrapped in parentheses - common in accounting to mark negative numbers for visibility
+        # Might as well strip those here
+        parentheses = re.search(r'\((.*?)\)', numFmt_dict[fmt]['numFmt_str'])
+        if parentheses:
+            numFmt_dict[fmt]['parentheses'] = True
+            numFmt_dict[fmt]['numFmt_str'] = parentheses.group(1)
+        
+        # ---STEP 7---
+        # Detect and strip currency symbols. Assume there's only going to be one per numFmt as it's invalid otherwise
+        currency_pattern = r'[\$\€\£\¥\₹\₽\₩\₪]'  # Add additional currency symbols here if needed
+        currencies = re.search(currency_pattern, numFmt_dict[fmt]['numFmt_str'])
+        if currencies:
+            numFmt_dict[fmt]['currency'] = currencies.group()
+            numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(currencies.group(), '')
+        
+        # ---STEP 8---
+        # Detect and strip negative symbols. Assume there's only going to be one per numFmt in position [0] as it's invalid otherwise
+        if numFmt_dict[fmt]['numFmt_str'][0] == '-':
+            numFmt_dict[fmt]['negative'] = True
+            numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'][1:]
+        
+        # ---STEP 9---
+        # Detect decimal point if present, and split numFmt, to give number of decimal places
+        numFmt_decimal_split = numFmt_dict[fmt]['numFmt_str'].split('.')
+        if len(numFmt_decimal_split) < 1:
+            print(f'Invalid number format: {numFmt}')
+        elif len(numFmt_decimal_split) == 1:
+            pass
+        elif len(numFmt_decimal_split) == 2:
+            numFmt_dict[fmt]['numFmt_str'] = numFmt_decimal_split[0]
+            numFmt_dict[fmt]['decimal_places'] = len((numFmt_decimal_split[1]))
+        else:  # Valid numbers shouldn't have more than one decimal place
+            print(f'Invalid number format: {numFmt}')
+        
+        # ---STEP 10---
+        # Detect and strip leading hashes indicating thousands separators or similar
+        if numFmt_dict[fmt]['numFmt_str'][0] == '#':
+            pass
+
+
+    for number_format in numFmt_dict:
+        print(f'{number_format}: {numFmt_dict[number_format]}')
+    
+
+    # # Check if int or float
+    # try:
+    #     int_value = int(value)
+    #     type = 'int'
+    # except ValueError:
+    #     # If it raises a ValueError, it's not an int
+    #     pass
+    
+    # # Try to convert to float
+    # try:
+    #     float_value = float(value)
+    #     type = 'float'
+    # except ValueError:
+    #     # If it raises a ValueError, it's not a float
+    #     pass
+
+    # if '.' in str(numFmt):
+    #     decimal_split_numFmt = str(numFmt).split('.')  # TODO - this is only going to work for formats with exactly one '.'
+    #     print(f'decimal, {type}, {len(decimal_split_numFmt[1])}d.p.')
+    # else:
+    #     print(f'int? {type}')
 
 
 def apply_excel_numFmtId(value, numFmtId):
@@ -115,8 +244,9 @@ if __name__ == '__main__':
     num_format_reference = 11
     test_value = 2
 
-    formatted_number = apply_excel_numFmtId(test_value, num_format_reference)
+    # formatted_number = apply_excel_numFmtId(test_value, num_format_reference)
     
-    print(f'{formatted_number}')
+    # print(f'{formatted_number}')
+    convert_custom_formats()
 
     print('   --- END ---')
