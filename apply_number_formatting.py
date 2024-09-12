@@ -93,11 +93,22 @@ def convert_custom_formats():  #(value, numFmt):
         # Check for time formats, figure out their length, and infer whether mm is months or minutes
         if re.search(r'[dmyhs]', numFmt_dict[fmt]['numFmt_str']):
             print(f'Date format: {numFmt_dict[fmt]['numFmt_str']}')
+            # First detect & strip AM/PM label
             if 'AM/PM' in numFmt_dict[fmt]['numFmt_str']:
                 numFmt_dict[fmt]['AM_PM_label'] = True
                 numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(' AM/PM', '')
                 numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace('AM/PM', '')
-            # if
+            # Next, check formats for days, years, hours and seconds
+            numFmt_dict[fmt]['d_count'] = numFmt_dict[fmt]['numFmt_str'].count('d')
+            numFmt_dict[fmt]['y_count'] = numFmt_dict[fmt]['numFmt_str'].count('y')
+            numFmt_dict[fmt]['h_count'] = numFmt_dict[fmt]['numFmt_str'].count('h')
+            numFmt_dict[fmt]['s_count'] = numFmt_dict[fmt]['numFmt_str'].count('s')
+            # TODO - figure out how to tell if mm is months or minutes
+            # Remove empty counters
+            time_counter_names = ['d_count', 'y_count', 'h_count', 's_count']
+            for time_counter in time_counter_names:
+                if numFmt_dict[fmt][time_counter] == 0:
+                    del numFmt_dict[fmt][time_counter]
         
         # ---STEP 7---
         # numFmt strings can be wrapped in parentheses - common in accounting to mark negative numbers for visibility
