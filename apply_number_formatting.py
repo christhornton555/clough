@@ -5,9 +5,8 @@ import re
 
 # Function systematically strips custom number formats down into their component parts so that they can be interpreted by python
 def convert_custom_formats():  #(value, numFmt):
-    #import re
     value = '6516516516351.1'
-    numFmt = '[Blue]_G£#,##0.00_);[Red](-$#,##0.00)_@" foo ";0.00;"sales "@" foo foo "'
+    numFmt = '[Blue]_G£#,##0.00_);[Red]h:mm:ss AM/PM;dd/mm/yy;"sales "@" foo foo "'
     type = ''
 
     # Number formatting guidance from https://support.microsoft.com/en-gb/office/review-guidelines-for-customizing-a-number-format-c0a1d1fa-d3f4-4018-96b7-9c9354dd99f5
@@ -46,6 +45,7 @@ def convert_custom_formats():  #(value, numFmt):
     for fmt in numFmt_dict:
         # print(numFmt_dict[fmt]['numFmt_str'])
         # TODO - check that numFmt_dict[fmt]['numFmt_str'] exists & isn't blank
+        # TODO - there's a localisation tag in square brackets - filter for that before colours
 
         # ---STEP 3---
         # Check colours and list in dict, and strip from numFmt_str. N.B. Excel puts colours in square brackets
@@ -88,8 +88,18 @@ def convert_custom_formats():  #(value, numFmt):
                 numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(f'"{text_string[0]}"', '')
         else:
             del numFmt_dict[fmt]['text_strings']  # Remove if empty
-        
+
         # ---STEP 6---
+        # Check for time formats, figure out their length, and infer whether mm is months or minutes
+        if re.search(r'[dmyhs]', numFmt_dict[fmt]['numFmt_str']):
+            print(f'Date format: {numFmt_dict[fmt]['numFmt_str']}')
+            if 'AM/PM' in numFmt_dict[fmt]['numFmt_str']:
+                numFmt_dict[fmt]['AM_PM_label'] = True
+                numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(' AM/PM', '')
+                numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace('AM/PM', '')
+            # if
+        
+        # ---STEP 7---
         # numFmt strings can be wrapped in parentheses - common in accounting to mark negative numbers for visibility
         # Might as well strip those here
         parentheses = re.search(r'\((.*?)\)', numFmt_dict[fmt]['numFmt_str'])
@@ -97,7 +107,7 @@ def convert_custom_formats():  #(value, numFmt):
             numFmt_dict[fmt]['parentheses'] = True
             numFmt_dict[fmt]['numFmt_str'] = parentheses.group(1)
         
-        # ---STEP 7---
+        # ---STEP 8---
         # Detect and strip currency symbols.
         # Assume there's only going to be one per numFmt as it's invalid otherwise
         currency_pattern = r'[\$\€\£\¥\₹\₽\₩\₪]'  # Add additional currency symbols here if needed
@@ -106,7 +116,7 @@ def convert_custom_formats():  #(value, numFmt):
             numFmt_dict[fmt]['currency'] = currencies.group()
             numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'].replace(currencies.group(), '')
         
-        # ---STEP 8---
+        # ---STEP 9---
         # Detect and strip negative symbols.
         # Assume there's only going to be one per numFmt, & in position [0], as it's invalid otherwise
         if len(numFmt_dict[fmt]['numFmt_str']) > 0:  # numFmt can have zero length if there's no entry
@@ -114,7 +124,7 @@ def convert_custom_formats():  #(value, numFmt):
                 numFmt_dict[fmt]['negative'] = True
                 numFmt_dict[fmt]['numFmt_str'] = numFmt_dict[fmt]['numFmt_str'][1:]
         
-        # ---STEP 9---
+        # ---STEP 10---
         # Detect decimal point if present, and split numFmt, to give number of decimal places
         numFmt_decimal_split = numFmt_dict[fmt]['numFmt_str'].split('.')
         if len(numFmt_decimal_split) < 1:
@@ -127,7 +137,7 @@ def convert_custom_formats():  #(value, numFmt):
         else:  # Valid numbers shouldn't have more than one decimal place
             print(f'Invalid number format: {numFmt}')
         
-        # ---STEP 10---
+        # ---STEP 11---
         # Detect and strip leading hashes indicating thousands separators or similar
         if len(numFmt_dict[fmt]['numFmt_str']) > 0:  # numFmt can have zero length if there's no entry
             if numFmt_dict[fmt]['numFmt_str'][0] == '#':
