@@ -103,12 +103,23 @@ def convert_custom_formats():  #(value, numFmt):
             numFmt_dict[fmt]['y_count'] = numFmt_dict[fmt]['numFmt_str'].count('y')
             numFmt_dict[fmt]['h_count'] = numFmt_dict[fmt]['numFmt_str'].count('h')
             numFmt_dict[fmt]['s_count'] = numFmt_dict[fmt]['numFmt_str'].count('s')
-            # TODO - figure out how to tell if mm is months or minutes
+            numFmt_dict[fmt]['month_count'] = 0
+            numFmt_dict[fmt]['min_count'] = 0
+            if numFmt_dict[fmt]['numFmt_str'].count('m') > 0:
+                # m values default to months in Excel unless they're immediately preceeded by an h OR an s (plus punctuation,
+                # e.g. : - etc.), or followed by an s (optionally preceeded by punctuation).
+                # If there's TWO m values, e.g. 'ddmmyy, hhmmss' or 'myhm', then the first m after an h is minutes unless there's 3
+                # or more m's, when it becomes months. i.e. yhmm = mins, yhmmm = months, mh = months, etc. Ugh.
+                if numFmt_dict[fmt]['h_count'] > 0 or numFmt_dict[fmt]['s_count'] > 0:
+                    print(f'Time?')
+                else:
+                    numFmt_dict[fmt]['month_count'] = numFmt_dict[fmt]['numFmt_str'].count('m')
             # Remove empty counters
-            time_counter_names = ['d_count', 'y_count', 'h_count', 's_count']
+            time_counter_names = ['d_count', 'y_count', 'h_count', 's_count', 'month_count', 'min_count']
             for time_counter in time_counter_names:
                 if numFmt_dict[fmt][time_counter] == 0:
                     del numFmt_dict[fmt][time_counter]
+            # TODO - do I need to zero the numFmt_str at this point?
         
         # ---STEP 7---
         # numFmt strings can be wrapped in parentheses - common in accounting to mark negative numbers for visibility
