@@ -6,7 +6,7 @@ import re
 # Function systematically strips custom number formats down into their component parts so that they can be interpreted by python
 def convert_custom_formats():  #(value, numFmt):
     value = '6516516516351.1'
-    numFmt = '[Blue]_G£#,##0.00_);[Red]h:mm:ss AM/PM;dd/mm/yy;"sales "@" foo foo "'
+    numFmt = '[Blue]_G£#,##0.00_);[Red]h:mm:ss AM/PM;ddmmyy hhmmss;"sales "@" foo foo "'
     type = ''
 
     # Number formatting guidance from https://support.microsoft.com/en-gb/office/review-guidelines-for-customizing-a-number-format-c0a1d1fa-d3f4-4018-96b7-9c9354dd99f5
@@ -109,13 +109,18 @@ def convert_custom_formats():  #(value, numFmt):
             if m_count > 0:
                 # m values default to months in Excel unless they're immediately preceeded by an h OR an s (plus punctuation,
                 # e.g. : - etc.), or followed by an s (optionally preceeded by punctuation).
-                # If there's TWO m values, e.g. 'ddmmyy, hhmmss' or 'myhm', then the first m after any h (not s) or before any s
+                # If there's TWO m values, e.g. 'ddmmyy hhmmss' or 'myhm', then the first m after any h (not s) or before any s
                 # is minutes unless there's 3 or more m's, when it becomes months. Ugh. I have a headache.
                 # i.e. yhmm = mins, yhmmm = months, mh = months, ym = months, yms = mins, etc.
                 if (numFmt_dict[fmt]['h_count'] > 0 or numFmt_dict[fmt]['s_count'] > 0) and m_count < 3:
-                    print(f'Time?')
+                    # Is the m preceeded by an h or an s (and however many non alphanumeric characters)?
+                    if re.search(r'h[^a-zA-Z0-9]*m', numFmt_dict[fmt]['numFmt_str']) or re.search(r's[^a-zA-Z0-9]*m', numFmt_dict[fmt]['numFmt_str']):
+                        print('mins easy preceed')
+                    # Is the m suceeded by an s (and however many non alphanumeric characters)?
+                    elif re.search(r'm[^a-zA-Z0-9]*s', numFmt_dict[fmt]['numFmt_str']):
+                        print('mins easy succeed')
                 else:
-                    numFmt_dict[fmt]['month_count'] = m_count
+                    numFmt_dict[fmt]['month_count'] = m_count  # TODO - this isn't handling 'ddmmyy hhmmss'
             # Remove empty counters
             time_counter_names = ['d_count', 'y_count', 'h_count', 's_count', 'month_count', 'min_count']
             for time_counter in time_counter_names:
