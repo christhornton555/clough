@@ -105,15 +105,17 @@ def convert_custom_formats():  #(value, numFmt):
             numFmt_dict[fmt]['s_count'] = numFmt_dict[fmt]['numFmt_str'].count('s')
             numFmt_dict[fmt]['month_count'] = 0
             numFmt_dict[fmt]['min_count'] = 0
-            if numFmt_dict[fmt]['numFmt_str'].count('m') > 0:
+            m_count = numFmt_dict[fmt]['numFmt_str'].count('m')
+            if m_count > 0:
                 # m values default to months in Excel unless they're immediately preceeded by an h OR an s (plus punctuation,
                 # e.g. : - etc.), or followed by an s (optionally preceeded by punctuation).
-                # If there's TWO m values, e.g. 'ddmmyy, hhmmss' or 'myhm', then the first m after an h is minutes unless there's 3
-                # or more m's, when it becomes months. i.e. yhmm = mins, yhmmm = months, mh = months, etc. Ugh.
-                if numFmt_dict[fmt]['h_count'] > 0 or numFmt_dict[fmt]['s_count'] > 0:
+                # If there's TWO m values, e.g. 'ddmmyy, hhmmss' or 'myhm', then the first m after any h (not s) or before any s
+                # is minutes unless there's 3 or more m's, when it becomes months. Ugh. I have a headache.
+                # i.e. yhmm = mins, yhmmm = months, mh = months, ym = months, yms = mins, etc.
+                if (numFmt_dict[fmt]['h_count'] > 0 or numFmt_dict[fmt]['s_count'] > 0) and m_count < 3:
                     print(f'Time?')
                 else:
-                    numFmt_dict[fmt]['month_count'] = numFmt_dict[fmt]['numFmt_str'].count('m')
+                    numFmt_dict[fmt]['month_count'] = m_count
             # Remove empty counters
             time_counter_names = ['d_count', 'y_count', 'h_count', 's_count', 'month_count', 'min_count']
             for time_counter in time_counter_names:
