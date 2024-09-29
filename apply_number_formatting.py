@@ -112,15 +112,30 @@ def convert_custom_formats():  #(value, numFmt):
                 # If there's TWO m values, e.g. 'ddmmyy hhmmss' or 'myhm', then the first m after any h (not s) or before any s
                 # is minutes unless there's 3 or more m's, when it becomes months. Ugh. I have a headache.
                 # i.e. yhmm = mins, yhmmm = months, mh = months, ym = months, yms = mins, etc.
+                m_sequences = re.findall(r'm+', numFmt_dict[fmt]['numFmt_str'])
                 if (numFmt_dict[fmt]['h_count'] > 0 or numFmt_dict[fmt]['s_count'] > 0) and m_count < 3:
                     # Is the m preceeded by an h or an s (and however many non alphanumeric characters)?
                     if re.search(r'h[^a-zA-Z0-9]*m', numFmt_dict[fmt]['numFmt_str']) or re.search(r's[^a-zA-Z0-9]*m', numFmt_dict[fmt]['numFmt_str']):
                         print('mins easy preceed')
+                        numFmt_dict[fmt]['min_count'] = m_count
                     # Is the m suceeded by an s (and however many non alphanumeric characters)?
                     elif re.search(r'm[^a-zA-Z0-9]*s', numFmt_dict[fmt]['numFmt_str']):
                         print('mins easy succeed')
+                        numFmt_dict[fmt]['min_count'] = m_count
+                # Is there more than one sequence of m's
+                elif len(m_sequences) > 1:
+                    for seq in m_sequences:
+                        print(seq)
+                    # numFmt_dict[fmt]['month_count'] += m_count  # Consider all 'm's as months
+                    # print('Months detected by m count >= 3')
                 else:
-                    numFmt_dict[fmt]['month_count'] = m_count  # TODO - this isn't handling 'ddmmyy hhmmss'
+                    # Look at positions to determine context
+                    if re.search(r'[^a-zA-Z0-9]*m[^a-zA-Z0-9]*', numFmt_dict[fmt]['numFmt_str']):  # General catch-all
+                        if numFmt_dict[fmt]['h_count'] == 0 and numFmt_dict[fmt]['s_count'] == 0:
+                            numFmt_dict[fmt]['month_count'] = m_count  # Default to months if no time indicators
+                        else:
+                            numFmt_dict[fmt]['min_count'] = m_count  # Default to minutes if time indicators exist
+                    print('Default rule applied (months/minutes)')
             # Remove empty counters
             time_counter_names = ['d_count', 'y_count', 'h_count', 's_count', 'month_count', 'min_count']
             for time_counter in time_counter_names:
