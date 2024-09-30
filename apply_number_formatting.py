@@ -6,7 +6,7 @@ import re
 # Function systematically strips custom number formats down into their component parts so that they can be interpreted by python
 def convert_custom_formats():  #(value, numFmt):
     value = '6516516516351.1'
-    numFmt = '[Blue]_G£#,##0.00_);[Red]h:mm:ss AM/PM;ddmmyy hhmmss;"sales "@" foo foo "'
+    numFmt = 'myhm;ym;ddmmyy hhmmmss;yms'
     type = ''
 
     # Number formatting guidance from https://support.microsoft.com/en-gb/office/review-guidelines-for-customizing-a-number-format-c0a1d1fa-d3f4-4018-96b7-9c9354dd99f5
@@ -122,20 +122,33 @@ def convert_custom_formats():  #(value, numFmt):
                     elif re.search(r'm[^a-zA-Z0-9]*s', numFmt_dict[fmt]['numFmt_str']):
                         print('mins easy succeed')
                         numFmt_dict[fmt]['min_count'] = m_count
+                    else:
+                        print('default months after easy mins fail')
+                        numFmt_dict[fmt]['month_count'] = m_count
+                # Is there a single string of 3+ m's
+                elif len(m_sequences) == 1 and m_count >= 3:
+                    print('long months easy')
+                    numFmt_dict[fmt]['month_count'] = m_count
                 # Is there more than one sequence of m's
                 elif len(m_sequences) > 1:
-                    for seq in m_sequences:
-                        print(seq)
-                    # numFmt_dict[fmt]['month_count'] += m_count  # Consider all 'm's as months
-                    # print('Months detected by m count >= 3')
+                    # TODO - Gonna assume for now no number formats will have more than 2 lots of m sequences
+                    # TODO - Buuuut it's possible a weird edge case format will do, so I'll just default those to months for now
+                    for seq in range(len(m_sequences)):
+                        print(m_sequences[seq])
+                        # If the seq is 3 or more m's it will always be months
+                        if len(m_sequences[seq]) >= 3:
+                            print(f'long months split {seq}')
+                            numFmt_dict[fmt][f'month_count_{seq}'] = len(m_sequences[seq])
+                    
                 else:
                     # Look at positions to determine context
                     if re.search(r'[^a-zA-Z0-9]*m[^a-zA-Z0-9]*', numFmt_dict[fmt]['numFmt_str']):  # General catch-all
                         if numFmt_dict[fmt]['h_count'] == 0 and numFmt_dict[fmt]['s_count'] == 0:
                             numFmt_dict[fmt]['month_count'] = m_count  # Default to months if no time indicators
+                            print('default months')
                         else:
                             numFmt_dict[fmt]['min_count'] = m_count  # Default to minutes if time indicators exist
-                    print('Default rule applied (months/minutes)')
+                            print('default mins')
             # Remove empty counters
             time_counter_names = ['d_count', 'y_count', 'h_count', 's_count', 'month_count', 'min_count']
             for time_counter in time_counter_names:
