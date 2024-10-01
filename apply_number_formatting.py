@@ -6,7 +6,7 @@ import re
 # Function systematically strips custom number formats down into their component parts so that they can be interpreted by python
 def convert_custom_formats():  #(value, numFmt):
     value = '6516516516351.1'
-    numFmt = 'myhm;ym;ddmmyy hhmmmss;yms'
+    numFmt = 'myhm;yyymms mmm;ddmmyy hhmmmss;yyymm'
     type = ''
 
     # Number formatting guidance from https://support.microsoft.com/en-gb/office/review-guidelines-for-customizing-a-number-format-c0a1d1fa-d3f4-4018-96b7-9c9354dd99f5
@@ -92,7 +92,7 @@ def convert_custom_formats():  #(value, numFmt):
         # ---STEP 6---
         # Check for time formats, figure out their length, and infer whether mm is months or minutes
         if re.search(r'[dmyhs]', numFmt_dict[fmt]['numFmt_str']):
-            print(f'Date format: {numFmt_dict[fmt]['numFmt_str']}')
+            print(f'----------\nDate format: {numFmt_dict[fmt]['numFmt_str']}')
             # First detect & strip AM/PM label
             if 'AM/PM' in numFmt_dict[fmt]['numFmt_str']:
                 numFmt_dict[fmt]['AM_PM_label'] = True
@@ -111,9 +111,10 @@ def convert_custom_formats():  #(value, numFmt):
                 # e.g. : - etc.), or followed by an s (optionally preceeded by punctuation).
                 # If there's TWO m values, e.g. 'ddmmyy hhmmss' or 'myhm', then the first m after any h (not s) or before any s
                 # is minutes unless there's 3 or more m's, when it becomes months. Ugh. I have a headache.
-                # i.e. yhmm = mins, yhmmm = months, mh = months, ym = months, yms = mins, etc.
+                # i.e. yhmm = mins, yhmmm = months, mh = months, ym = months, yms = mins, yyymms = mins, yyymm = months, etc.
                 m_sequences = re.findall(r'm+', numFmt_dict[fmt]['numFmt_str'])
-                if (numFmt_dict[fmt]['h_count'] > 0 or numFmt_dict[fmt]['s_count'] > 0) and m_count < 3:
+                print(f'm_sequences = {m_sequences}')
+                if (numFmt_dict[fmt]['h_count'] > 0 or numFmt_dict[fmt]['s_count'] > 0) and len(m_sequences) == 1 and m_count < 3:
                     # Is the m preceeded by an h or an s (and however many non alphanumeric characters)?
                     if re.search(r'h[^a-zA-Z0-9]*m', numFmt_dict[fmt]['numFmt_str']) or re.search(r's[^a-zA-Z0-9]*m', numFmt_dict[fmt]['numFmt_str']):
                         print('mins easy preceed')
@@ -137,9 +138,30 @@ def convert_custom_formats():  #(value, numFmt):
                         print(m_sequences[seq])
                         # If the seq is 3 or more m's it will always be months
                         if len(m_sequences[seq]) >= 3:
-                            print(f'long months split {seq}')
+                            print(f'seq{seq} long months')
                             numFmt_dict[fmt][f'month_count_{seq}'] = len(m_sequences[seq])
-                    
+                        else:
+                            # Find all contiguous 'm' substrings and their positions using regex
+                            m_matches = list(re.finditer(r'm+', numFmt_dict[fmt]['numFmt_str']))
+                            for match in m_matches:
+                                # Get the position of the last 'm' in the current match
+                                end_pos = match.end()
+                                # Find the next alphabetical character after this 'm' substring
+                                # Use a loop to skip over any non-alphabetical characters
+                                print(match)
+                                next_alpha = None
+                                for char in numFmt_dict[fmt]['numFmt_str'][end_pos:]:
+                                    if char.isalpha():
+                                        next_alpha = char
+                                        break
+                                # Check if the next alphabetical character is 's'
+                                print(f'next alpha = {next_alpha}')
+                                if next_alpha == 's':
+                                    print(f'seq{seq} mins')
+                                    numFmt_dict[fmt][f'min_count_{seq}'] = len(m_sequences[seq])
+                                else:
+                                    print(f'seq{seq} months')
+                                    numFmt_dict[fmt][f'month_count_{seq}'] = len(m_sequences[seq])
                 else:
                     # Look at positions to determine context
                     if re.search(r'[^a-zA-Z0-9]*m[^a-zA-Z0-9]*', numFmt_dict[fmt]['numFmt_str']):  # General catch-all
