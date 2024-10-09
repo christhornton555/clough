@@ -29,27 +29,20 @@ for i in range(len(dt_formats)):
 
             # Could be minutes or months
             if len(seq_string) == 1 or len(seq_string) == 2:
-                if not found_minute:
-                    # Check for 'h' or 's' preceding the 'm's
-                    is_minute = False
-                    idx = seq_start - 1
+                is_minute = False
 
-                    while idx >= 0:
-                        char = dt_format[idx]
-                        if char.isalnum():
-                            if char in ('h', 's'):
-                                is_minute = True
-                            break
-                        idx -= 1
+                # First, check if 'h' or 's' precedes the 'm's
+                idx = seq_start - 1
+                while idx >= 0:
+                    char = dt_format[idx]
+                    if char.isalnum():
+                        if char in ('h', 's'):
+                            is_minute = True
+                        break
+                    idx -= 1
 
-                    if is_minute:
-                        seq_analysis_list.append(f'{seq_string}: Minute')
-                        found_minute = True
-                    else:
-                        seq_analysis_list.append(f'{seq_string}: Month')
-                else:
-                    # Default to months unless 's' is found after the 'm' sequence
-                    is_minute = False
+                # If not found, check if 's' follows the 'm's
+                if not is_minute:
                     idx = seq_end
                     while idx < len(dt_format):
                         char = dt_format[idx]
@@ -59,12 +52,20 @@ for i in range(len(dt_formats)):
                             break
                         idx += 1
 
+                # Apply 'found_minute' logic
+                if found_minute:
+                    if is_minute:
+                        seq_analysis_list.append(f'{seq_string}: Minute')
+                        # found_minute remains True
+                    else:
+                        seq_analysis_list.append(f'{seq_string}: Month')
+                else:
                     if is_minute:
                         seq_analysis_list.append(f'{seq_string}: Minute')
                         found_minute = True
                     else:
                         seq_analysis_list.append(f'{seq_string}: Month')
-                        
+
             else:
                 # All other lengths are always months
                 if len(seq_string) == 3:
