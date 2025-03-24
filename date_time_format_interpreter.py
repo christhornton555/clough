@@ -1,86 +1,77 @@
 import re
+import datetime
 
-dt_formats = ['myhm',
-              'yyymms mmm',
-              'ddmmyy hhmmmss',
-              'yyymm',
-              'yyyymm - s mmm',
-              'yyhhmm - s mmm ddmm',
-              'ddhhyyy',
-              'mmmmdddd',
-              'hdmsm',
-              'yys mm  smm',
-              'mmyyh mm  smm m   - s']
 
-output_list = []
 
-for i in range(len(dt_formats)):
-    dt_format = dt_formats[i].lower()  # Excel is case insensitive
-    if dt_format.count('m') > 0:
-        m_sequences = list(re.finditer(r'm+', dt_format))
+def split_excel_format(format_string):
+    # Split the format string into tokens
+    tokens = []
+    i = 0
+    length = len(format_string)
 
-        seq_analysis_list = []
-        found_minute = False  # Track if a minute has been found
+    while i < length:
+        if format_string[i] == '\\' and i + 1 < length:
+            # Escape sequence: \x → literal x
+            tokens.append(format_string[i+1])
+            i += 2
+        elif format_string[i].isalpha():
+            # Start of a format token
+            j = i + 1
+            while j < length and format_string[j] == format_string[i]:
+                j += 1
+            token = format_string[i:j]
+            tokens.append(token)
+            i = j
+        else:
+            # Start of punctuation or space
+            j = i + 1
+            while j < length and not format_string[j].isalpha() and format_string[j] != '\\':
+                j += 1
+            tokens.append(format_string[i:j])
+            i = j
 
-        for seq in m_sequences:
-            seq_string = seq.group()
-            seq_start = seq.start()
-            seq_end = seq.end()
+    return tokens
 
-            # Could be minutes or months
-            if len(seq_string) == 1 or len(seq_string) == 2:
-                is_minute = False
+def interpret_mins_or_month(full_datetime_format):
+    print('"m" found')
 
-                # First, check if 'h' or 's' precedes the 'm's
-                idx = seq_start - 1
-                while idx >= 0:
-                    char = dt_format[idx]
-                    if char.isalnum():
-                        if char in ('h', 's'):
-                            is_minute = True
-                        break
-                    idx -= 1
+def format_datetime(raw_datetime_value, excel_datetime_format):
+    # Excel considers 1900-01-01 as day 1, but Python's datetime starts at 1900-01-01 as day 0
+    # Excel incorrectly treats 1900 as a leap year, so we subtract 2 days to align
+    base_date = datetime.datetime(1899, 12, 30)
+    days = int(raw_datetime_value)
+    fractional_day = raw_datetime_value - days
+    seconds = round(fractional_day * 86400)  # Round like this to avoid discrepancies with rounding errors
+    delta = datetime.timedelta(days=days, seconds=seconds)
 
-                # If not found, check if 's' follows the 'm's
-                if not is_minute:
-                    idx = seq_end
-                    while idx < len(dt_format):
-                        char = dt_format[idx]
-                        if char.isalnum():
-                            if char == 's':
-                                is_minute = True
-                            break
-                        idx += 1
+    converted_datetime = base_date + delta  # Excel datetime float is now a Python datetime object. Now we need to format it
 
-                # Apply 'found_minute' logic
-                if found_minute:
-                    if is_minute:
-                        seq_analysis_list.append(f'{seq_string}: Minute')
-                        # found_minute remains True
-                    else:
-                        seq_analysis_list.append(f'{seq_string}: Month')
-                else:
-                    if is_minute:
-                        seq_analysis_list.append(f'{seq_string}: Minute')
-                        found_minute = True
-                    else:
-                        seq_analysis_list.append(f'{seq_string}: Month')
 
-            else:
-                # All other lengths are always months
-                if len(seq_string) == 3:
-                    seq_analysis_list.append(f'{seq_string}: Jul')
-                elif len(seq_string) == 4:
-                    seq_analysis_list.append(f'{seq_string}: July')
-                elif len(seq_string) == 5:
-                    seq_analysis_list.append(f'{seq_string}: J')
-                else:
-                    seq_analysis_list.append(f'{seq_string}: default - July')
+    python_datetime_format = ''  # We'll concatenate Python datetime formatting onto this string
+    excel_datetime_format = excel_datetime_format.lower()  # Excel datetime formats are case insensitive
 
-        output_list.append(f"{i}. Sequences found: {seq_analysis_list}")
+    tokenised_excel_datetime_format = split_excel_format(excel_datetime_format)
+
+    print(tokenised_excel_datetime_format)
+    
+
+    if excel_datetime_format.count('m') > 0:
+        interpret_mins_or_month(excel_datetime_format)
 
     else:
-        output_list.append(f"{i}. No 'm' sequences found")
+        print('"m" not found')
 
-for statement in output_list:
-    print(statement)
+    python_datetime_format += '%d %B %Y %H:%M:%S'
+    
+    return converted_datetime.strftime(python_datetime_format)
+
+
+
+sample_time = 28714.5068981481  # 12/08/1978 12:09:56
+
+dt_formats = ['yyyymmdd hh:mm:ss']
+
+for i in range(len(dt_formats)):
+    formatted_datetime = format_datetime(sample_time, dt_formats[i])
+
+    print(formatted_datetime)
