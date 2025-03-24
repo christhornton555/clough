@@ -10,7 +10,7 @@ def split_excel_format(format_string):
     while i < length:
         if format_string[i] == '\\' and i + 1 < length:
             # Escape sequence: \x → literal x
-            tokens.append(format_string[i+1])
+            tokens.append('\\' + format_string[i+1])
             i += 2
         elif format_string[i].isalpha():
             # Start of a format token
@@ -83,7 +83,6 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
         'am/pm': '%p',  # AM or PM
         'a/p': '%p'     # Excel shorthand (A/P) → AM/PM in Python
     }
-
     
 
     if excel_datetime_format.count('m') > 0:
@@ -95,11 +94,10 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
     for token in tokenised_excel_datetime_format:
         if token in format_conversion_lookup_dict:
             python_datetime_format += format_conversion_lookup_dict[token]
+        elif token[0] == '\\':  # Handle escaped characters
+            python_datetime_format += token[1]
         else:
-            python_datetime_format += token
-    
-
-    # python_datetime_format += '%d %B %Y %H:%M:%S'
+            python_datetime_format += token  # Add punctuation, excaped characters etc, unchanged
     
     return converted_datetime.strftime(python_datetime_format)
 
@@ -107,7 +105,7 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
 
 sample_time = 28714.5068981481  # 12/08/1978 12:09:56
 
-dt_formats = ['yyyymmdd hh:mm:ss']
+dt_formats = ['yyyymmdd hh:mm:ss \\s']
 
 for i in range(len(dt_formats)):
     formatted_datetime = format_datetime(sample_time, dt_formats[i])
