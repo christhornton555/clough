@@ -91,8 +91,15 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
 
     else:
         print('"m" not found')
+    
+    for token in tokenised_excel_datetime_format:
+        if token in format_conversion_lookup_dict:
+            python_datetime_format += format_conversion_lookup_dict[token]
+        else:
+            python_datetime_format += token
+    
 
-    python_datetime_format += '%d %B %Y %H:%M:%S'
+    # python_datetime_format += '%d %B %Y %H:%M:%S'
     
     return converted_datetime.strftime(python_datetime_format)
 
