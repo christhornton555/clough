@@ -1,8 +1,6 @@
 import re
 import datetime
 
-
-
 def split_excel_format(format_string):
     # Split the format string into tokens
     tokens = []
@@ -51,8 +49,41 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
     excel_datetime_format = excel_datetime_format.lower()  # Excel datetime formats are case insensitive
 
     tokenised_excel_datetime_format = split_excel_format(excel_datetime_format)
-
     print(tokenised_excel_datetime_format)
+
+    format_conversion_lookup_dict = {
+        # Year
+        'yyyy': '%Y',  # Four-digit year
+        'yyy': '%Y',   # Not standard in Excel, but map to four-digit year
+        'yy': '%y',    # Two-digit year
+        'y': '%y',     # Not standard, fallback to 2-digit year
+
+        # N.B. Only defining the "m" values as months. There's separate logic to handle minutes
+        # Month
+        'mmmm': '%B',  # Full month name
+        'mmm': '%b',   # Abbreviated month name
+        'mm': '%m',    # Two-digit month number (01–12)
+        'm': '%-m',    # One-digit month number (1–12)
+
+        # Day
+        'dddd': '%A',  # Full weekday name
+        'ddd': '%a',   # Abbreviated weekday name
+        'dd': '%d',    # Two-digit day of month (01–31)
+        'd': '%-d',    # One-digit day of month (1–31)
+
+        # Hour
+        'hh': '%H',    # Two-digit hour (00–23)
+        'h': '%-H',    # One-digit hour (0–23)
+
+        # Second
+        'ss': '%S',    # Two-digit seconds (00–59)
+        's': '%-S',    # One-digit seconds (0–59)
+
+        # AM/PM
+        'am/pm': '%p',  # AM or PM
+        'a/p': '%p'     # Excel shorthand (A/P) → AM/PM in Python
+    }
+
     
 
     if excel_datetime_format.count('m') > 0:
