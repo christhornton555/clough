@@ -30,20 +30,25 @@ def split_excel_format(format_string):
 
     return tokens
 
-def interpret_mins_or_month(tokenised_excel_datetime_format):
-    print('"m" found')
+
+def find_positions_of_m_tokens(tokenised_excel_datetime_format):
+    valid_m_positions = []
+
     for i in range(len(tokenised_excel_datetime_format)):
         # "m" is in the first token
         if tokenised_excel_datetime_format[i].count('m') > 0 and i == 0:
             print(f'i == {i}, m_token = {tokenised_excel_datetime_format[i]}, next token = {tokenised_excel_datetime_format[i+1]}')
+            valid_m_positions.append(i)
 
         # 'm' is in a token somewhere in the middle
         elif tokenised_excel_datetime_format[i].count('m') > 0 and i > 0 and i < len(tokenised_excel_datetime_format) - 1:
             print(f'i == {i} (>0), m_token = {tokenised_excel_datetime_format[i]}, previous token = {tokenised_excel_datetime_format[i-1]}, next token = {tokenised_excel_datetime_format[i+1]}')
+            valid_m_positions.append(i)
 
         # 'm' is in the last token
         elif tokenised_excel_datetime_format[i].count('m') > 0 and i == len(tokenised_excel_datetime_format) - 1:
             print(f'i == {i} (len), m_token = {tokenised_excel_datetime_format[i]}, previous token = {tokenised_excel_datetime_format[i-1]}')
+            valid_m_positions.append(i)
 
         # 'm' is not in this token
         elif tokenised_excel_datetime_format[i].count('m') == 0:
@@ -52,6 +57,13 @@ def interpret_mins_or_month(tokenised_excel_datetime_format):
         else:  # Should be unreachable
             print(f'Error. i == {i}, m_token = {tokenised_excel_datetime_format[i]}')
 
+    return valid_m_positions
+
+
+def interpret_mins_or_month(tokenised_excel_datetime_format):
+    print('"m" found')
+    print(find_positions_of_m_tokens(tokenised_excel_datetime_format))
+    
 
 def format_datetime(raw_datetime_value, excel_datetime_format):
     # Excel considers 1900-01-01 as day 1, but Python's datetime starts at 1900-01-01 as day 0
