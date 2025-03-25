@@ -30,8 +30,28 @@ def split_excel_format(format_string):
 
     return tokens
 
-def interpret_mins_or_month(full_datetime_format):
+def interpret_mins_or_month(tokenised_excel_datetime_format):
     print('"m" found')
+    for i in range(len(tokenised_excel_datetime_format)):
+        # "m" is in the first token
+        if tokenised_excel_datetime_format[i].count('m') > 0 and i == 0:
+            print(f'i == {i}, m_token = {tokenised_excel_datetime_format[i]}, next token = {tokenised_excel_datetime_format[i+1]}')
+
+        # 'm' is in a token somewhere in the middle
+        elif tokenised_excel_datetime_format[i].count('m') > 0 and i > 0 and i < len(tokenised_excel_datetime_format) - 1:
+            print(f'i == {i} (>0), m_token = {tokenised_excel_datetime_format[i]}, previous token = {tokenised_excel_datetime_format[i-1]}, next token = {tokenised_excel_datetime_format[i+1]}')
+
+        # 'm' is in the last token
+        elif tokenised_excel_datetime_format[i].count('m') > 0 and i == len(tokenised_excel_datetime_format) - 1:
+            print(f'i == {i} (len), m_token = {tokenised_excel_datetime_format[i]}, previous token = {tokenised_excel_datetime_format[i-1]}')
+
+        # 'm' is not in this token
+        elif tokenised_excel_datetime_format[i].count('m') == 0:
+            print(f'i == {i}, no "m" in this token')
+
+        else:  # Should be unreachable
+            print(f'Error. i == {i}, m_token = {tokenised_excel_datetime_format[i]}')
+
 
 def format_datetime(raw_datetime_value, excel_datetime_format):
     # Excel considers 1900-01-01 as day 1, but Python's datetime starts at 1900-01-01 as day 0
@@ -86,7 +106,7 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
     
 
     if excel_datetime_format.count('m') > 0:
-        interpret_mins_or_month(excel_datetime_format)
+        interpret_mins_or_month(tokenised_excel_datetime_format)
 
     else:
         print('"m" not found')
