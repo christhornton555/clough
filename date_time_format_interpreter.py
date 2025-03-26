@@ -1,34 +1,30 @@
 import re
 import datetime
+import platform
 
 def split_excel_format(format_string):
     # Split the format string into tokens
-    tokens = []
-    i = 0
-    length = len(format_string)
 
-    while i < length:
-        if format_string[i] == '\\' and i + 1 < length:
-            # Escape sequence: \x → literal x
-            tokens.append('\\' + format_string[i+1])
-            i += 2
-        elif format_string[i].isalpha():
-            # Start of a format token
-            j = i + 1
-            while j < length and format_string[j] == format_string[i]:
-                j += 1
-            token = format_string[i:j]
-            tokens.append(token)
-            i = j
-        else:
-            # Start of punctuation or space
-            j = i + 1
-            while j < length and not format_string[j].isalpha() and format_string[j] != '\\':
-                j += 1
-            tokens.append(format_string[i:j])
-            i = j
+    # List all valid Excel format tokens, longest first to match greedily
+    excel_tokens = [
+        'am/pm', 'a/p',
+        'yyyy', 'yyy', 'yy', 'y',
+        'dddd', 'ddd', 'dd', 'd',
+        'mmmm', 'mmm', 'mm', 'm',
+        'hh', 'h',
+        'ss', 's',
+    ]
 
-    return tokens
+    # Build regex pattern with alternation
+    # This regex matches:
+    # - \x → escaped character
+    # - runs of the same letter (e.g. "yyyy", "hh")
+    # - literal text (e.g. "foo")
+    # - non-letters (spaces, colons, slashes)
+    token_pattern = '|'.join(re.escape(tok) for tok in sorted(excel_tokens, key=len, reverse=True))
+    pattern = re.compile(rf'(\\.)|({token_pattern})|([a-zA-Z]+)|([^a-zA-Z\\]+)', re.IGNORECASE)
+
+    return [match.group(0) for match in pattern.finditer(format_string)]
 
 
 def find_positions_of_m_tokens(tokenised_excel_datetime_format):
@@ -113,8 +109,12 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
     converted_datetime = base_date + delta  # Excel datetime float is now a Python datetime object. Now we need to format it
 
 
+    is_windows = platform.system() == 'Windows'  # strftime() works slightly differently on Windows & *nix
+
+
     python_datetime_format = ''  # We'll concatenate Python datetime formatting onto this string
     excel_datetime_format = excel_datetime_format.lower()  # Excel datetime formats are case insensitive
+    print(excel_datetime_format)
 
     tokenised_excel_datetime_format = split_excel_format(excel_datetime_format)
     print(tokenised_excel_datetime_format)
@@ -131,21 +131,21 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
         'mmmm': '%B',  # Full month name
         'mmm': '%b',   # Abbreviated month name
         'mm': '%m',    # Two-digit month number (01–12)
-        'm': '%-m',    # One-digit month number (1–12)
+        'm': '%m' if is_windows else '%-m',    # One-digit month number (1–12)
 
         # Day
         'dddd': '%A',  # Full weekday name
         'ddd': '%a',   # Abbreviated weekday name
         'dd': '%d',    # Two-digit day of month (01–31)
-        'd': '%-d',    # One-digit day of month (1–31)
+        'd': '%d' if is_windows else '%-d',    # One-digit day of month (1–31)
 
         # Hour
         'hh': '%H',    # Two-digit hour (00–23)
-        'h': '%-H',    # One-digit hour (0–23)
+        'h': '%H' if is_windows else '%-H',    # One-digit hour (0–23)
 
         # Second
         'ss': '%S',    # Two-digit seconds (00–59)
-        's': '%-S',    # One-digit seconds (0–59)
+        's': '%S' if is_windows else '%-S',    # One-digit seconds (0–59)
 
         # AM/PM
         'am/pm': '%p',  # AM or PM
@@ -175,11 +175,21 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
 
 
 
-sample_time = 28714.5068981481  # 12/08/1978 12:09:56
+if __name__ == '__main__':
+    print('   --- START ---')
 
-dt_formats = ['yyyy/mm/dd hh:mm:ss \\s']  # TODO - make sure escaped characters get double-escaped
+    sample_time = 28714.5068981481  # 12/08/1978 12:09:56
 
-for i in range(len(dt_formats)):
-    formatted_datetime = format_datetime(sample_time, dt_formats[i])
+    dt_formats = [r"yyyy/mm/dd hh:mm:ss \s foo",  # 1978/08/12 12:09:56 s foo
+                  r"ddd dd.mmm.yy hh.mm",  # Sat 12.Aug.78 12.09
+                  r"d mmm y",  # 12 Aug 78
+                  r"d mmm 'y"]  # 12 Aug '78
 
-    print(formatted_datetime)
+    
+
+    for i in range(len(dt_formats)):
+        formatted_datetime = format_datetime(sample_time, dt_formats[i])
+
+        print(formatted_datetime)
+
+    print('   --- END ---')
