@@ -37,22 +37,23 @@ def find_positions_of_m_tokens(tokenised_excel_datetime_format):
     for i in range(len(tokenised_excel_datetime_format)):
         # "m" is in the first token
         if tokenised_excel_datetime_format[i].count('m') > 0 and i == 0:
-            print(f'i == {i}, m_token = {tokenised_excel_datetime_format[i]}, next token = {tokenised_excel_datetime_format[i+1]}')
+            # print(f'i == {i}, m_token = {tokenised_excel_datetime_format[i]}, next token = {tokenised_excel_datetime_format[i+1]}')
             valid_m_positions.append(i)
 
         # 'm' is in a token somewhere in the middle
         elif tokenised_excel_datetime_format[i].count('m') > 0 and i > 0 and i < len(tokenised_excel_datetime_format) - 1:
-            print(f'i == {i} (>0), m_token = {tokenised_excel_datetime_format[i]}, previous token = {tokenised_excel_datetime_format[i-1]}, next token = {tokenised_excel_datetime_format[i+1]}')
+            # print(f'i == {i} (>0), m_token = {tokenised_excel_datetime_format[i]}, previous token = {tokenised_excel_datetime_format[i-1]}, next token = {tokenised_excel_datetime_format[i+1]}')
             valid_m_positions.append(i)
 
         # 'm' is in the last token
         elif tokenised_excel_datetime_format[i].count('m') > 0 and i == len(tokenised_excel_datetime_format) - 1:
-            print(f'i == {i} (len), m_token = {tokenised_excel_datetime_format[i]}, previous token = {tokenised_excel_datetime_format[i-1]}')
+            # print(f'i == {i} (len), m_token = {tokenised_excel_datetime_format[i]}, previous token = {tokenised_excel_datetime_format[i-1]}')
             valid_m_positions.append(i)
 
         # 'm' is not in this token
         elif tokenised_excel_datetime_format[i].count('m') == 0:
-            print(f'i == {i}, no "m" in this token')
+            # print(f'i == {i}, no "m" in this token')
+            pass
 
         else:  # Should be unreachable
             print(f'Error. i == {i}, m_token = {tokenised_excel_datetime_format[i]}')
@@ -61,8 +62,42 @@ def find_positions_of_m_tokens(tokenised_excel_datetime_format):
 
 
 def interpret_mins_or_month(tokenised_excel_datetime_format):
-    print('"m" found')
-    print(find_positions_of_m_tokens(tokenised_excel_datetime_format))
+    positions = find_positions_of_m_tokens(tokenised_excel_datetime_format)
+    print(f'"m" found at {positions}')
+
+    for pos in positions:
+        current_token = tokenised_excel_datetime_format[pos]
+        is_minute = False
+
+        # Look backwards
+        i = pos - 1
+        while i >= 0:
+            token = tokenised_excel_datetime_format[i]
+            if token.isalpha():
+                if 'h' in token:
+                    is_minute = True
+                    break
+                elif 's' in token:
+                    is_minute = True
+                    break
+                else:
+                    break  # found an unrelated letter token
+            i -= 1
+
+        # Look forwards only if not already decided
+        if not is_minute:
+            i = pos + 1
+            while i < len(tokenised_excel_datetime_format):
+                token = tokenised_excel_datetime_format[i]
+                if token.isalpha():
+                    if 's' in token:
+                        is_minute = True
+                    break  # found a letter token, whether it's 's' or not
+                i += 1
+
+        interpretation = 'minute' if is_minute else 'month'
+        print(f'Token "{current_token}" at position {pos} is interpreted as: {interpretation}')
+
     
 
 def format_datetime(raw_datetime_value, excel_datetime_format):
@@ -137,7 +172,7 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
 
 sample_time = 28714.5068981481  # 12/08/1978 12:09:56
 
-dt_formats = ['yyyymmdd hh:mm:ss \\s']
+dt_formats = ['yyyymmdd hh:mm:ss \\s']  # TODO - make sure escaped characters get double-escaped
 
 for i in range(len(dt_formats)):
     formatted_datetime = format_datetime(sample_time, dt_formats[i])
