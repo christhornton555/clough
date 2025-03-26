@@ -64,6 +64,7 @@ def find_positions_of_m_tokens(tokenised_excel_datetime_format):
 def interpret_mins_or_month(tokenised_excel_datetime_format):
     positions = find_positions_of_m_tokens(tokenised_excel_datetime_format)
     print(f'"m" found at {positions}')
+    minute_token_positions = set()
 
     for pos in positions:
         current_token = tokenised_excel_datetime_format[pos]
@@ -95,9 +96,13 @@ def interpret_mins_or_month(tokenised_excel_datetime_format):
                     break  # found a letter token, whether it's 's' or not
                 i += 1
 
+        if is_minute:
+            minute_token_positions.add(pos)
+
         interpretation = 'minute' if is_minute else 'month'
         print(f'Token "{current_token}" at position {pos} is interpreted as: {interpretation}')
 
+    return minute_token_positions
     
 
 def format_datetime(raw_datetime_value, excel_datetime_format):
@@ -152,16 +157,20 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
     }
     
 
+    minute_positions = set()
     if excel_datetime_format.count('m') > 0:
-        interpret_mins_or_month(tokenised_excel_datetime_format)
+        minute_positions = interpret_mins_or_month(tokenised_excel_datetime_format)
 
     else:
         print('"m" not found')
     
-    for token in tokenised_excel_datetime_format:
-        if token in format_conversion_lookup_dict:
+    for idx, token in enumerate(tokenised_excel_datetime_format):
+        if token in ['m', 'mm'] and idx in minute_positions:
+            # Disambiguated as minutes
+            python_datetime_format += '%M' if token == 'mm' else '%-M'
+        elif token in format_conversion_lookup_dict:
             python_datetime_format += format_conversion_lookup_dict[token]
-        elif token[0] == '\\':  # Handle escaped characters
+        elif token.startswith('\\'):  # Handle escaped characters
             python_datetime_format += token[1]
         else:
             python_datetime_format += token  # Add punctuation, excaped characters etc, unchanged
@@ -172,7 +181,7 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
 
 sample_time = 28714.5068981481  # 12/08/1978 12:09:56
 
-dt_formats = ['yyyymmdd hh:mm:ss \\s']  # TODO - make sure escaped characters get double-escaped
+dt_formats = ['yyyy/mm/dd hh:mm:ss \\s']  # TODO - make sure escaped characters get double-escaped
 
 for i in range(len(dt_formats)):
     formatted_datetime = format_datetime(sample_time, dt_formats[i])
