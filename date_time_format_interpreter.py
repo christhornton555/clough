@@ -55,7 +55,7 @@ def find_positions_of_m_tokens(tokenised_excel_datetime_format):
 
 def interpret_mins_or_month(tokenised_excel_datetime_format):
     positions = find_positions_of_m_tokens(tokenised_excel_datetime_format)
-    print(f'"m" found at {positions}')
+    # print(f'"m" found at {positions}')
     minute_token_positions = set()
 
     for pos in positions:
@@ -114,10 +114,10 @@ def format_datetime(raw_datetime_value, excel_datetime_format):
 
     python_datetime_format = ''  # We'll concatenate Python datetime formatting onto this string
     excel_datetime_format = excel_datetime_format.lower()  # Excel datetime formats are case insensitive
-    print(excel_datetime_format)
+    # print(excel_datetime_format)
 
     tokenised_excel_datetime_format = split_excel_format(excel_datetime_format)
-    print(tokenised_excel_datetime_format)
+    print(f'{excel_datetime_format} = {tokenised_excel_datetime_format}')
 
     format_conversion_lookup_dict = {
         # Year
