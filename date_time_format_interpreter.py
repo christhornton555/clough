@@ -1,6 +1,7 @@
 import re
 import datetime
 import platform
+import os
 
 def split_excel_format(format_string):
     # Split the format string into tokens
@@ -180,16 +181,28 @@ if __name__ == '__main__':
 
     sample_time = 28714.5068981481  # 12/08/1978 12:09:56
 
-    dt_formats = [r"yyyy/mm/dd hh:mm:ss \s foo",  # 1978/08/12 12:09:56 s foo
-                  r"ddd dd.mmm.yy hh.mm",  # Sat 12.Aug.78 12.09
-                  r"d mmm y",  # 12 Aug 78
-                  r"d mmm 'y"]  # 12 Aug '78
+    # dt_formats = [r"yyyy/mm/dd hh:mm:ss \s foo",  # 1978/08/12 12:09:56 s foo
+    #               r"ddd dd.mmm.yy hh.mm",  # Sat 12.Aug.78 12.09
+    #               r"d mmm y",  # 12 Aug 78
+    #               r"d mmm 'y"]  # 12 Aug '78
 
     
+    # for i in range(len(dt_formats)):
+    #     formatted_datetime = format_datetime(sample_time, dt_formats[i])
 
-    for i in range(len(dt_formats)):
-        formatted_datetime = format_datetime(sample_time, dt_formats[i])
+    #     print(formatted_datetime)
 
-        print(formatted_datetime)
+    # Read datetime formats from CSV file
+
+    format_file_path = os.path.join('test_data', 'test_num_formats.csv')
+    with open(format_file_path, 'r', encoding='utf-8') as f:
+        dt_formats = [line.strip() for line in f if line.strip()]  # skip empty lines
+
+    for i, excel_format in enumerate(dt_formats):
+        try:
+            formatted_datetime = format_datetime(sample_time, excel_format)
+            print(formatted_datetime)
+        except Exception as e:
+            print(f"Error formatting with '{excel_format}': {e}")
 
     print('   --- END ---')
